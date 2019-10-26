@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  postgres:
+    image: postgres:12
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - PGUSER=postgres
+      - POSTGRES_DB=sos
+      - POSTGRES_PASSWORD=
+    volumes:
+      - .docker-compose-volumes/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
