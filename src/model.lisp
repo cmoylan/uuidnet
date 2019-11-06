@@ -11,6 +11,7 @@
                 :retrieve-all
                 :retrieve-one)
   (:export :create-tables
+           :all-users
            :find-user
            :for-template
            :add-user
@@ -38,16 +39,14 @@
     :uuid (user-uuid user)
     :username (user-username user)))
 
-(defun create-user-table ()
-  "Create user table if it doesn't exist yet."
-  (with-connection (db)
-    (execute
-     (create-table (:user :if-not-exists nil)
-         ((id :type 'serial :primary-key t)
-          (username :type 'text :not-null t :unique t)
-          (email :type 'text :not-null t :unique t)
-          (password :type 'text :not-null t)
-          (uuid :type 'text :not-null t :unique t))))))
+
+(defun all-users ()
+  "return all users."
+  (with-connectoin (db)
+    (retreive-all
+     (select :*
+       (from :user))
+     :as 'user)))
 
 (defun add-user (username email password)
   "add user record to database."
@@ -109,3 +108,19 @@
     (if password-hash
         (values (cl-pass:check-password password password-hash) t)
         (values nil nil))))
+
+;;; TODO: export to db
+(defun create-tables ()
+  "Create all tables"
+  (create-user-table))
+
+(defun create-user-table ()
+  "Create user table if it doesn't exist yet."
+  (with-connection (db)
+    (execute
+     (create-table (:user :if-not-exists nil)
+         ((id :type 'serial :primary-key t)
+          (username :type 'text :not-null t :unique t)
+          (email :type 'text :not-null t :unique t)
+          (password :type 'text :not-null t)
+          (uuid :type 'text :not-null t :unique t))))))

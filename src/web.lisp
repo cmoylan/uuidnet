@@ -8,6 +8,10 @@
         :uuidnet.model
         :datafly
         :sxql)
+  ;; FIXME: view.render conflicts with a function in web also named render
+  (:shadowing-import-from :uuidnet.view
+                :render)
+  (:shadowing-import-from :uuidnet.model :all-users)
   (:export :*web*))
 (in-package :uuidnet.web)
 
@@ -27,6 +31,12 @@
 @route GET "/"
 (defun root ()
   (render #P"index.html"))
+
+;;; All users
+@route GET "/users"
+(defun user-index ()
+  (render #P"users/index.html" (list :users (all-users))))
+
 
 ;;; New user
 (defroute "/users/new" ()

@@ -20,7 +20,9 @@
                "sxql"
 
                ;; hashing password
-               :cl-pass
+               "cl-pass"
+               ;; generate unique identifiers
+               "uuid"
                )
   :components ((:module "src"
                 :components
