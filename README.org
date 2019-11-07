@@ -1,0 +1,7 @@
+# uuidnet
+
+* Current tasks
+** TODO fix database connection
+** TODO create /users endpoint
+** TODO set up user sessions
+** TODO figure out migrations

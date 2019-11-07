@@ -1,6 +1,6 @@
 (in-package :cl-user)
 (defpackage uuidnet.view
-  (:use :cl :uuidnet.model)
+  (:use :cl)
   (:import-from :uuidnet.config
                 :*template-directory*)
   (:import-from :caveman2

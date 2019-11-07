@@ -22,7 +22,9 @@
 (defconfig :common
     `(:databases ((:maindb :postgres
                            :database-name "uuidnet_dev"
-                           :username "postgres"))))
+                           :username "postgres"
+                           :port 5432
+                           :host "0.0.0.0"))))
 
 (defconfig |development|
   '())

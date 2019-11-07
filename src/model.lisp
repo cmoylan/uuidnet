@@ -43,7 +43,7 @@
 (defun all-users ()
   "return all users."
   (with-connectoin (db)
-    (retreive-all
+    (retrieve-all
      (select :*
        (from :user))
      :as 'user)))
