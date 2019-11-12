@@ -1,7 +1,10 @@
 # uuidnet
 
 * Current tasks
-** TODO fix database connection
+** DONE fix database connection
+CLOSED: [2019-11-12 Tue 07:15]
 ** TODO create /users endpoint
 ** TODO set up user sessions
-** TODO figure out migrations
+** DONE figure out migrations
+CLOSED: [2019-11-12 Tue 07:15]
+** TODO Move db component into src/db
