@@ -31,6 +31,12 @@
                  (:file "view" :depends-on ("config"))
                  (:file "db" :depends-on ("config"))
                  (:file "model" :depends-on ("db")) ;; model
-                 (:file "config"))))
+                 (:file "config")
+                 (:file "schema" :depends-on ("db")))))
+
+               ;;;(:module "db"
+               ;;;         :pathname "db"
+               ;;;         :components
+               ;;;         ((:file "schema" :depends-on ("src")))))
   :description ""
   :in-order-to ((test-op (test-op "uuidnet-test"))))
