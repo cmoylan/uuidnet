@@ -13,8 +13,10 @@
   (:export :create-tables
            :all-users
            :find-user
+           :find-user-by-uuid
            :for-template
            :add-user
+           :add-open-user
            :seed-users
            :authenticate-user
            :add-page
@@ -32,18 +34,21 @@
   uuid
   email
   password
+  created-at
+  updated-at
 )
 
 (defun seed-users ()
   "Create some test users."
-  (add-user ("cmoylan" "cmoylan@example.com" "abc123"))
+  (add-user "cmoylan" "cmoylan@example.com" "abc123")
   )
 
 (defun for-template (user)
   "transform the user struct into an alist"
   (list :email (user-email user)
     :uuid (user-uuid user)
-    :username (user-username user)))
+    :username (user-username user)
+    :password-set (not (null (user-password user)))  ))
 
 
 (defun all-users ()
@@ -51,18 +56,31 @@
   (with-connection (db)
     (retrieve-all
      (select :*
-       (from :user))
+       (from :users))
      :as 'user)))
 
 (defun add-user (username email password)
   "add user record to database."
   (with-connection (db)
     (execute
-     (insert-into :user
+     (insert-into :users
        (set= :username username
              :email email
-             :password (cl-pass:hash password)
-             :uuid (generate-uuid))))))
+             ; :password (cl-pass:hash password)
+             :uuid (generate-uuid)
+             :created_at (local-time:now)
+             :updated_at (local-time:now))))))
+
+
+(defun add-open-user ()
+  "Add a user without a password."
+  (with-connection (db)
+    (execute
+     (insert-into :users
+                  (set= :uuid (generate-uuid)
+                        :created_at (local-time:now)
+                        :updated_at (local-time:now))))))
+
 
 (defun generate-uuid ()
   "return a reasonably-unique uuid"
@@ -76,25 +94,28 @@
   (with-connection (db)
     (retrieve-one
      (select :*
-        (from :user)
+        (from :users)
        (where (:= :username username)))
      :as 'user)))
+
 
  (defun find-user-by-email (email)
    "lookup user record by email."
    (with-connection (db)
      (retrieve-one
-       (select :* (from :user)
+       (select :* (from :users)
                (where (:= :email email)))
        :as 'user)))
+
 
  (defun find-user-by-uuid (uuid)
   "lookup user record by uuid."
   (with-connection (db) 
     (retrieve-one
-      (select :* (from :user)
+      (select :* (from :users)
               (where (:= :uuid uuid)))
       :as 'user)))
+
 
 (defun find-user (identifier)
    "lookup user record by username or email."

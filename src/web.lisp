@@ -32,6 +32,13 @@
 (defun root ()
   (render #P"index.html"))
 
+
+;;; Show uuid
+@route GET "/uuid/:uuid"
+(defun uuid-show (&key uuid)
+  (user-show :uuid uuid))
+
+
 ;;; All users
 @route GET "/users"
 (defun user-index ()
@@ -42,18 +49,21 @@
 (defroute "/users/new" ()
   (render #P"users/new.html"))
 
+
 ;;; Show user
 @route GET "/users/:uuid"
 (defun user-show (&key uuid)
-  (let ((user (find-user uuid)))
+  (let ((user (find-user-by-uuid uuid)))
     (if user
         (render #P"users/show.html" (list :user (for-template user)))
         (redirect (url-for :root)))))
+
 
 ;;; Edit user
 @route GET "/users/:uuid/edit"
 (defun user-edit (&key uuid)
   "user edit")
+
 
 ;;; Save user
 @route POST "/users/:uuid"

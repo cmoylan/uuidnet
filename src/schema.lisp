@@ -34,11 +34,11 @@
   "Create the users table."
   (with-connection (db)
     (execute
-     (create-table (:user :if-not-exists nil)
+     (create-table (:users :if-not-exists nil)
          ((id :type 'serial :primary-key t)
-          (username :type 'text :not-null t :unique t)
-          (email :type 'text :not-null t :unique t)
-          (password :type 'text :not-null t)
+          (username :type 'text :unique t)
+          (email :type 'text :unique t)
+          (password :type 'text)
           (uuid :type 'text :not-null t :unique t)
           (created_at :type 'timestamp :not-null t)
           (updated_at :type 'timestamp :not-null t))))))
@@ -48,7 +48,7 @@
   "Create the messges table."
   (with-connection (db)
     (execute
-     (create-table (:message :if-not-exists nil)
+     (create-table (:messages :if-not-exists nil)
          ((id :type 'serial :primary-key t)
           (sender_id :type 'int :not-null t)
           (recipient_id :type 'int :not-null t)
@@ -61,9 +61,9 @@
 
   (with-connection (db)
     (execute
-     (drop-table :user :if-exists t)
+     (drop-table :users :if-exists t)
      )
     (execute
-     (drop-table :message :if-exists t)
+     (drop-table :messages :if-exists t)
      ))
   )
