@@ -12,7 +12,7 @@
                 :retrieve-one)
   (:export :migrate
            :reset
-           :seed))
+           ))
 
 (in-package :uuidnet.db.schema)
 
@@ -27,11 +27,6 @@
   "Drop all tables and recreate."
   (drop-all-tables)
   (migrate))
-
-(defun seed ()
-  "Create basic test data."
-
-  )
 
 
 ;; --- Individual migrations --- ;;

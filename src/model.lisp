@@ -15,6 +15,7 @@
            :find-user
            :for-template
            :add-user
+           :seed-users
            :authenticate-user
            :add-page
            :get-latest-page
@@ -32,6 +33,11 @@
   email
   password
 )
+
+(defun seed-users ()
+  "Create some test users."
+  (add-user ("cmoylan" "cmoylan@example.com" "abc123"))
+  )
 
 (defun for-template (user)
   "transform the user struct into an alist"
