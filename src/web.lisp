@@ -18,12 +18,16 @@
 ;; for @route annotation
 (syntax:use-syntax :annot)
 
+;; Get a value of Referer header.
+;;(http-referer *request*)
+
 ;;
 ;; Application
 
 (defclass <web> (<app>) ())
 (defvar *web* (make-instance '<web>))
 (clear-routing-rules *web*)
+(defvar *current-user* nil)
 
 ;;
 ;; Routing rules
@@ -36,9 +40,35 @@
 ;;; Show uuid
 @route GET "/uuid/:uuid"
 (defun uuid-show (&key uuid)
-  (user-show :uuid uuid))
+  (with-authenticated-user
+    (render #P"users/show.html" (list :user (for-template user)))))
 
 
+;;; Authenticate uuid
+@route POST "/uuid/:uuid/auth"
+(defun uuid-auth (&key uuid)
+  (let ((user (find-user-by-uuid uuid)))
+    (if (and user
+             (authenticate-user user))
+        (add-user-to-session user)))
+  (uuid-show uuid))
+
+(defun add-user-to-session (user)
+  (setf (gethash :current_uuid *session*) (user-uuid user)))
+
+(defun set-current-user-from-session ()
+  (let ((user (find-user-by-uuid
+               (gethash :current_uuid *session*))))
+    (setf *current-user* user)))
+
+(defmacro with-authenticated-user (&body body)
+  `(let ((user (find-user-by-uuid
+                (gethash :current_uuid *session*))))
+     (if user
+         ,@body
+         (redirect (url-for :root)))))
+
+;;;
 ;;; All users
 @route GET "/users"
 (defun user-index ()
