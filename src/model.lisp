@@ -127,7 +127,8 @@
 
 
 (defun user-requires-auth-p (user)
-  (not (null (user-password user))))
+  (and user
+       (not (null (user-password user)))))
 
 
 (defun authenticate-user (user password)

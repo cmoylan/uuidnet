@@ -41,8 +41,14 @@
 @route GET "/uuid/:uuid"
 (defun uuid-show (&key uuid)
   (try-authenticate-user uuid
-   (render #P"users/show.html" (list :user (for-template user)))))
+    (let ((user (find-user-by-uuid uuid)))
+      (render #P"users/show.html" (list :user (for-template user))))))
 
+
+;;; Auth form
+@route GET "/uuid/:uuid/auth"
+(defun uuid-auth-form (&key uuid)
+  (render #P"users/auth.html"))
 
 ;;; Authenticate uuid
 @route POST "/uuid/:uuid/auth"
@@ -63,31 +69,35 @@
     (setf *current-user* user)))
 
 (defun try-expire-session ()
-  (let ((ttl (decf (gethash :ttl *session* 0))))
-    (if (< ttl 0)
-        (progn                          ; clear the session
-          (setf (gethash :current_uuid *session*) nil)
-          (setf (gethash :ttl *session*) nil))
-    )))
+  "If there is a user in the session decrememt the ttl.
+   If the ttl is below 0 expire the session."
+  (let ((ttl (gethash :ttl *session*)))
+    (if ttl
+        (if (< ttl 0)
+            (progn                          ; clear the session
+              (setf (gethash :current_uuid *session*) nil)
+              (setf (gethash :ttl *session*) nil))
+            (decf (gethash :ttl *session*))))))
 
 
 (defmacro try-authenticate-user (uuid &body body)
   "Check session user against current action"
-  `(try-expire-session)
-  ; page is open
-  ; - render page
-  ; page is closed
-  ; - if session user is page user
-  ; -- render page
-  ; - if seesion user is not page user
-  ; -- redirect
-  `(let ((user-for-page (find-user-by-uuid ,uuid))
-         (uuid-from-session (gethash :current_uuid *session*)))
-     (if (or (not (user-requires-auth-p user-for-page))
-             (eq ,uuid uuid-from-session))
-         ,@body                                   ; render
-        (redirect (url-for :root))                ; redirect
-     )))
+  `(progn
+     (try-expire-session)
+     ;; page is open
+     ;; - render page
+     ;; page is closed
+     ;; - if session user is page user
+     ;; -- render page
+     ;; - if seesion user is not page user
+     ;; -- redirect
+     (let ((user-for-page (find-user-by-uuid ,uuid))
+            (uuid-from-session (gethash :current_uuid *session* nil)))
+        (if (or (not (user-requires-auth-p user-for-page))
+                (eq ,uuid uuid-from-session))
+            ,@body                                   ; render
+           (redirect (url-for :uuid-auth-form ,uuid))      ; redirect to login
+        ))))
 
 
 
