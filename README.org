@@ -1,10 +1,24 @@
-# uuidnet
+#+TITLE: uuidnet
+#+STARTUP: content
+
+
+* Setup
+** run ~make up~
+** from a lisp shell:
+#+BEGIN_SRC lisp
+ (ql:quickload :uuidnet)
+ (uuidnet.db.schema:migrate)
+ (uuidnet.model:seed-users)
+ (uuidnet:start)
+#+END_SRC
+
 
 * Current tasks
+** TODO create /users endpoint
+** TODO Move db component into src/db
+** TODO allow someone to claim a uuid by entering a password
+** TODO set up user sessions
 ** DONE fix database connection
 CLOSED: [2019-11-12 Tue 07:15]
-** TODO create /users endpoint
-** TODO set up user sessions
 ** DONE figure out migrations
 CLOSED: [2019-11-12 Tue 07:15]
-** TODO Move db component into src/db
