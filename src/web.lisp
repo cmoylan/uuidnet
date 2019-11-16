@@ -10,7 +10,7 @@
         :sxql)
   ;; FIXME: view.render conflicts with a function in web also named render
   (:shadowing-import-from :uuidnet.view
-                :render)
+                          :render)
   (:shadowing-import-from :uuidnet.model :all-users)
   (:export :*web*))
 (in-package :uuidnet.web)
@@ -40,8 +40,8 @@
 ;;; Show uuid
 @route GET "/uuid/:uuid"
 (defun uuid-show (&key uuid)
-  (with-authenticated-user
-    (render #P"users/show.html" (list :user (for-template user)))))
+  (try-authenticate-user uuid
+   (render #P"users/show.html" (list :user (for-template user)))))
 
 
 ;;; Authenticate uuid
@@ -54,20 +54,52 @@
   (uuid-show uuid))
 
 (defun add-user-to-session (user)
-  (setf (gethash :current_uuid *session*) (user-uuid user)))
+  (setf (gethash :current_uuid *session*) (user-uuid user))
+  (setf (gethash :ttl *session*) 100))
 
 (defun set-current-user-from-session ()
   (let ((user (find-user-by-uuid
                (gethash :current_uuid *session*))))
     (setf *current-user* user)))
 
-(defmacro with-authenticated-user (&body body)
-  `(let ((user (find-user-by-uuid
-                (gethash :current_uuid *session*))))
-     (if user
-         ,@body
-         (redirect (url-for :root)))))
+(defun try-expire-session ()
+  (let ((ttl (decf (gethash :ttl *session* 0))))
+    (if (< ttl 0)
+        (progn                          ; clear the session
+          (setf (gethash :current_uuid *session*) nil)
+          (setf (gethash :ttl *session*) nil))
+    )))
 
+
+(defmacro try-authenticate-user (uuid &body body)
+  "Check session user against current action"
+  `(try-expire-session)
+  ; page is open
+  ; - render page
+  ; page is closed
+  ; - if session user is page user
+  ; -- render page
+  ; - if seesion user is not page user
+  ; -- redirect
+  `(let ((user-for-page (find-user-by-uuid ,uuid))
+         (uuid-from-session (gethash :current_uuid *session*)))
+     (if (or (not (user-requires-auth-p user-for-page))
+             (eq ,uuid uuid-from-session))
+         ,@body                                   ; render
+        (redirect (url-for :root))                ; redirect
+     )))
+
+
+
+
+
+@route POST "/uuid/:uuid"
+(defun uuid-update (&key uuid)
+  )
+
+
+
+;;;
 ;;;
 ;;; All users
 @route GET "/users"
@@ -86,7 +118,7 @@
   (let ((user (find-user-by-uuid uuid)))
     (if user
         (render #P"users/show.html" (list :user (for-template user)))
-        (redirect (url-for :root)))))
+      (redirect (url-for :root)))))
 
 
 ;;; Edit user
@@ -98,8 +130,7 @@
 ;;; Save user
 @route POST "/users/:uuid"
 (defun user-update (&key uuid)
-    (format "hello there ~A" uuid)
-  )
+  (format "hello there ~A" uuid))
 
 
 ;;

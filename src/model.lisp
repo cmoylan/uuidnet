@@ -12,13 +12,14 @@
                 :retrieve-one)
   (:export :create-tables
            :all-users
+           :authenticate-user
            :find-user
            :find-user-by-uuid
            :for-template
            :add-user
            :add-open-user
            :seed-users
-           :authenticate-user
+           :user-requires-auth-p
            :add-page
            :get-latest-page
            :get-latest-pages-by-user
@@ -123,6 +124,11 @@
    (or (find-user-by-username identifier)
        (find-user-by-email identifier)
        (find-user-by-uuid identifier)))
+
+
+(defun user-requires-auth-p (user)
+  (not (null (user-password user))))
+
 
 (defun authenticate-user (user password)
   "Lookup user record and validate password. Returns two values:
