@@ -29,6 +29,10 @@
 (clear-routing-rules *web*)
 (defvar *current-user* nil)
 
+(defun render-with-session (template &rest args)
+  (render template (append args (list :current-user *current-user*))))
+
+
 ;;
 ;; Routing rules
 
@@ -37,22 +41,45 @@
   (render #P"index.html"))
 
 
-;;; Show uuid
-@route GET "/uuid/:uuid"
-(defun uuid-show (&key uuid)
+;;; --- User routes --- ;;;
+
+;;; All users
+@route GET "/users"
+(defun user-index ()
+  (render #P"users/index.html" (list :users (all-users))))
+
+;;;
+;;; Show user
+@route GET "/u/:uuid"
+(defun user-show (&key uuid)
   (try-authenticate-user uuid
     (let ((user (find-user-by-uuid uuid)))
-      (render #P"users/show.html" (list :user (for-template user))))))
+      (render-with-session #P"users/show.html" :user (for-template user)))))
 
+
+;;; Edit user
+@route GET "/u/:uuid/edit"
+(defun user-edit (&key uuid)
+  "user edit")
+
+
+;;; Update user
+@route POST "/u/:uuid"
+(defun user-update (&key uuid)
+  )
+
+
+
+;;; --- Authentication routes --- ;;;
 
 ;;; Auth form
-@route GET "/uuid/:uuid/auth"
-(defun uuid-auth-form (&key uuid)
+@route GET "/u/:uuid/auth"
+(defun user-auth-form (&key uuid)
   (render #P"users/auth.html"))
 
 ;;; Authenticate uuid
-@route POST "/uuid/:uuid/auth"
-(defun uuid-auth (&key uuid)
+@route POST "/u/:uuid/auth"
+(defun user-auth (&key uuid)
   (let ((user (find-user-by-uuid uuid)))
     (if (and user
              (authenticate-user user))
@@ -96,51 +123,9 @@
         (if (or (not (user-requires-auth-p user-for-page))
                 (eq ,uuid uuid-from-session))
             ,@body                                   ; render
-           (redirect (url-for :uuid-auth-form ,uuid))      ; redirect to login
+           (redirect (url-for :user-auth-form))      ; redirect to login
         ))))
 
-
-
-
-
-@route POST "/uuid/:uuid"
-(defun uuid-update (&key uuid)
-  )
-
-
-
-;;;
-;;;
-;;; All users
-@route GET "/users"
-(defun user-index ()
-  (render #P"users/index.html" (list :users (all-users))))
-
-
-;;; New user
-(defroute "/users/new" ()
-  (render #P"users/new.html"))
-
-
-;;; Show user
-@route GET "/users/:uuid"
-(defun user-show (&key uuid)
-  (let ((user (find-user-by-uuid uuid)))
-    (if user
-        (render #P"users/show.html" (list :user (for-template user)))
-      (redirect (url-for :root)))))
-
-
-;;; Edit user
-@route GET "/users/:uuid/edit"
-(defun user-edit (&key uuid)
-  "user edit")
-
-
-;;; Save user
-@route POST "/users/:uuid"
-(defun user-update (&key uuid)
-  (format "hello there ~A" uuid))
 
 
 ;;
