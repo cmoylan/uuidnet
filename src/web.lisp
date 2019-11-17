@@ -75,16 +75,38 @@
 ;;; Auth form
 @route GET "/u/:uuid/auth"
 (defun user-auth-form (&key uuid)
-  (render #P"users/auth.html"))
+  (render #P"users/auth.html" (list :uuid uuid)))
 
 ;;; Authenticate uuid
 @route POST "/u/:uuid/auth"
-(defun user-auth (&key uuid)
-  (let ((user (find-user-by-uuid uuid)))
-    (if (and user
-             (authenticate-user user))
-        (add-user-to-session user)))
-  (uuid-show uuid))
+(defun user-auth (&key uuid _parsed)
+  (let ((params (build-params _parsed)))
+(print params)
+    (print (gethash :password params))
+        )
+  ;;(let ((password (find 'password _parsed :key 'car))))
+  (print _parsed)
+  (print (length _parsed))
+   ;;(format nil "~S"  (find :uuid _parsed :key 'car))
+   (format nil "~S"  (assoc (intern "PASSWORD") _parsed))
+  ;; need password from somewhere
+  ;;(let ((user (find-user-by-uuid uuid)))
+  ;;  (if (and user
+  ;;           (authenticate-user user password))
+  ;;      (add-user-to-session user)))
+  ;;(uuid-show uuid))
+  )
+
+(defun build-params (raw)
+  "Build a dict from the params cons list."
+  (let ((results (make-hash-table)))
+    (loop for param_pair in raw
+          do (progn
+               (print (type-of (car param_pair)))
+               (setf (gethash (intern (string (car param_pair))) results)
+                     (cdr param_pair))))
+    results))
+
 
 (defun add-user-to-session (user)
   (setf (gethash :current_uuid *session*) (user-uuid user))
