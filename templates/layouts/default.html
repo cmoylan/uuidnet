@@ -6,6 +6,10 @@
   <link rel="stylesheet" type="text/css" media="screen" href="/css/main.css">
 </head>
 <body>
+  {% if flash %}
+  {{ flash }}
+  {% endif %}
+
   {% block content %}{% endblock %}
 </body>
 </html>

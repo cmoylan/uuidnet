@@ -67,7 +67,7 @@
      (insert-into :users
        (set= :username username
              :email email
-             ; :password (cl-pass:hash password)
+             :password (cl-pass:hash password)
              :uuid (generate-uuid)
              :created_at (local-time:now)
              :updated_at (local-time:now))))))

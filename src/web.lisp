@@ -2,6 +2,7 @@
 (defpackage uuidnet.web
   (:use :cl
         :caveman2
+        :alexandria
         :uuidnet.config
         :uuidnet.view
         :uuidnet.db
@@ -28,10 +29,24 @@
 (defvar *web* (make-instance '<web>))
 (clear-routing-rules *web*)
 (defvar *current-user* nil)
+(defvar *flash* nil)
 
 (defun render-with-session (template &rest args)
-  (render template (append args (list :current-user *current-user*))))
+  ;; add flash to list of rendered vars
+  (let ((session-params (list :current-user *current-user*)))
+    (if *flash*
+        (setf session-params (append session-params (list :flash *flash*)))
+        )
+    (render template (append args session-params))
+    )
+  )
 
+(defmacro with-flash (type message &body body)
+  `(progn
+     (setf *flash* (list ,type ,message))
+     ,@body
+     )
+  )
 
 ;;
 ;; Routing rules
@@ -80,16 +95,20 @@
 ;;; Authenticate uuid
 @route POST "/u/:uuid/auth"
 (defun user-auth (&key uuid _parsed)
-  (let ((params (build-params _parsed)))
-(print params)
-    (print (gethash :password params))
-        )
-  ;;(let ((password (find 'password _parsed :key 'car))))
-  (print _parsed)
-  (print (length _parsed))
-   ;;(format nil "~S"  (find :uuid _parsed :key 'car))
-   (format nil "~S"  (assoc (intern "PASSWORD") _parsed))
-  ;; need password from somewhere
+  (let* ((params (build-params _parsed))
+        (password (gethash (intern "PASSWORD") params))
+        (user (find-user-by-uuid uuid)))
+
+    (if (and user
+             (authenticate-user user password))
+        (progn
+          (add-user-to-session user)
+          (redirect (url-for :user-show uuid)))
+        (progn
+          (redirect (url-for :user-auth-form uuid)))
+          ;;
+          )
+             )
   ;;(let ((user (find-user-by-uuid uuid)))
   ;;  (if (and user
   ;;           (authenticate-user user password))
@@ -102,8 +121,11 @@
   (let ((results (make-hash-table)))
     (loop for param_pair in raw
           do (progn
-               (print (type-of (car param_pair)))
-               (setf (gethash (intern (string (car param_pair))) results)
+               ;;(print (type-of (car param_pair)))
+               ;;(print (cdr param_pair))
+               (setf (gethash (intern
+                               (string-upcase
+                                (string (car param_pair)))) results)
                      (cdr param_pair))))
     results))
 
@@ -145,7 +167,7 @@
         (if (or (not (user-requires-auth-p user-for-page))
                 (eq ,uuid uuid-from-session))
             ,@body                                   ; render
-           (redirect (url-for :user-auth-form))      ; redirect to login
+           (redirect (url-for :user-auth-form ,uuid))      ; redirect to login
         ))))
 
 
