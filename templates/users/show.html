@@ -1,22 +1,18 @@
 {% extends "layouts/default.html" %}
 
 {% block content %}
+
 {% if user.password-set %}
-Welcome back!
+<p>Welcome back!</p>
 {% else %}
-This profile is open. You can claim it by setting a password.
+<p>This profile is open. You can claim it by setting a password.</p>
 {% endif %}
 
-asdfasdf
 
---------------------
-<br />
-Email: {{ user.email }}
-<br/>
-UUID: {{ user.uuid }}
-<br/>
-username: {{ user.username }}
-<br />
-current user: {{ current-user }}
+<ul>
+<li>Email: {{ user.email }}</li>
+<li>UUID: {{ user.uuid }}</li>
+<li>username: {{ user.username }}</li>
+</ul>
 
 {% endblock %}

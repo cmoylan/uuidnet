@@ -36,9 +36,11 @@
   ;; add flash to list of rendered vars
   (let ((session-params (list :current-user *current-user*)))
     (if *flash*
+        (progn
           (setf session-params (append session-params
                                        (list :flash-type (string-downcase (first *flash*))
-                                             :flash-message (second *flash*)))))
+                                             :flash-message (second *flash*))))
+          (setf *flash* nil)))
     (render template (append args session-params))))
 
 
@@ -68,11 +70,9 @@
     (if ttl
         (if (< ttl 0)
             (progn                          ; clear the session
-              (print "clearnig the sesh")
               (setf (gethash :current_uuid *session*) nil)
               (setf (gethash :ttl *session*) nil))
             (progn
-              (print "not clearning the sesh")
               (decf (gethash :ttl *session*)))))))
 
 
@@ -121,7 +121,11 @@
 ;;; All users
 @route GET "/users"
 (defun user-index ()
-  (render #P"users/index.html" (list :users (all-users))))
+  (render #P"users/index.html" (list :user-uuids
+                                     (map 'list
+                                          #'user-uuid
+                                          (all-users)))))
+
 
 ;;;
 ;;; Show user
@@ -129,9 +133,8 @@
 (defun user-show (&key uuid)
   (try-authenticate-user uuid
     (let ((user (find-user-by-uuid uuid)))
-      (with-flash :info "testing the flash"
-        (render-with-session #P"users/show.html" :user (for-template user))))))
-      ;(render #P"users/show.html" (list :user (for-template user))))))
+      ;(with-flash :info "testing the flash"
+        (render-with-session #P"users/show.html" :user (for-template user)))));)
 
 
 ;;; Edit user

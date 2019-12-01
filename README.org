@@ -17,7 +17,9 @@
 ** TODO create /users endpoint
 ** TODO Move db component into src/db
 ** TODO allow someone to claim a uuid by entering a password
-** TODO set up user sessions
+** TODO Fix imports in web.lisp
+** DONE set up user sessions
+CLOSED: [2019-11-30 Sat 22:16]
 ** DONE fix database connection
 CLOSED: [2019-11-12 Tue 07:15]
 ** DONE figure out migrations
