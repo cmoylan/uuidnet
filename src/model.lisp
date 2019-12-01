@@ -20,14 +20,11 @@
            :add-open-user
            :seed-users
            :user-requires-auth-p
-           :add-page
-           :get-latest-page
-           :get-latest-pages-by-user
-           :get-sorted-pages
-           :count-pages
-           :nth-page-revision))
+           :user-uuid
+           ))
 
 (in-package :uuidnet.model)
+
 
 (defstruct user
   id
@@ -39,10 +36,12 @@
   updated-at
 )
 
+
 (defun seed-users ()
   "Create some test users."
   (add-user "cmoylan" "cmoylan@example.com" "abc123")
   )
+
 
 (defun for-template (user)
   "transform the user struct into an alist"
@@ -59,6 +58,7 @@
      (select :*
        (from :users))
      :as 'user)))
+
 
 (defun add-user (username email password)
   "add user record to database."
@@ -139,7 +139,7 @@
    (VALUES NIL NIL) -> user not found
    (VALUES NIL T) -> user found, but wrong password
    (VALUES T T) -> password correct"
-  (let ((password-hash (getf user :password)))
+  (let ((password-hash (user-password user)))
     (if password-hash
         (values (cl-pass:check-password password password-hash) t)
         (values nil nil))))

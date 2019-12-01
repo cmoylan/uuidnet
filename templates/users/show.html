@@ -1,11 +1,13 @@
 {% extends "layouts/default.html" %}
 
+{% block content %}
 {% if user.password-set %}
 Welcome back!
 {% else %}
 This profile is open. You can claim it by setting a password.
 {% endif %}
 
+asdfasdf
 
 --------------------
 <br />
@@ -16,3 +18,5 @@ UUID: {{ user.uuid }}
 username: {{ user.username }}
 <br />
 current user: {{ current-user }}
+
+{% endblock %}

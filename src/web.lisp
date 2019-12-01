@@ -31,15 +31,19 @@
 (defvar *current-user* nil)
 (defvar *flash* nil)
 
+
 (defun render-with-session (template &rest args)
   ;; add flash to list of rendered vars
   (let ((session-params (list :current-user *current-user*)))
     (if *flash*
-        (setf session-params (append session-params (list :flash *flash*)))
+        (progn
+          (print "getting here")
+        (setf session-params (append session-params (list :flash *flash*))))
         )
     (render template (append args session-params))
     )
   )
+
 
 (defmacro with-flash (type message &body body)
   `(progn
@@ -47,6 +51,83 @@
      ,@body
      )
   )
+
+;;; Authentication
+;;;
+(defun add-user-to-session (user)
+  (setf (gethash :current_uuid *session*) (uuidnet.model::user-uuid user))
+  (setf (gethash :ttl *session*) 100))
+
+
+(defun set-current-user-from-session ()
+  (let ((user (find-user-by-uuid
+               (gethash :current_uuid *session*))))
+    (setf *current-user* user)))
+
+
+(defun try-expire-session ()
+  "If there is a user in the session decrememt the ttl.
+   If the ttl is below 0 expire the session."
+  (let ((ttl (gethash :ttl *session*)))
+    (if ttl
+        (if (< ttl 0)
+            (progn                          ; clear the session
+              (print "clearnig the sesh")
+              (setf (gethash :current_uuid *session*) nil)
+              (setf (gethash :ttl *session*) nil))
+            (progn
+              (print "not clearning the sesh")
+              (decf (gethash :ttl *session*)))))))
+
+
+(defun build-params (raw)
+  "Build a dict from the params cons list."
+  (let ((results (make-hash-table)))
+    (loop for param_pair in raw
+          do (progn
+               ;;(print (type-of (car param_pair)))
+               ;;(print (cdr param_pair))
+               (setf (gethash (intern
+                               (string-upcase
+                                (string (car param_pair)))) results)
+                     (cdr param_pair))))
+    results))
+
+
+;;; does this have to be a macro???
+;; *session* seems to be unavailable when this macro is compiled/expanded
+(defmacro try-authenticate-user (uuid &body body)
+  "Check session user against current action"
+  `(progn
+     (try-expire-session)
+     ;; page is open
+     ;; - render page
+     ;; page is closed
+     ;; - if session user is page user
+     ;; -- render page
+     ;; - if seesion user is not page user
+     ;; -- redirect
+     (let ((user-for-page (find-user-by-uuid ,uuid))
+            (uuid-from-session (gethash :current_uuid *session* nil)))
+        (if (or (not (user-requires-auth-p user-for-page))
+                (string= ,uuid uuid-from-session))
+            ,@body                                   ; render
+            (progn
+              ;; (print "condision: ")
+              ;; (print (or (not (user-requires-auth-p user-for-page))
+              ;;   (eq ,uuid uuid-from-session)))
+
+              ;;  (print "uuid is uuid from sesh: ")
+              ;;  (print (eq ,uuid uuid-from-session))
+
+
+              ;; (print "redirecting inside try-auth")
+              ;; (print "sesh uuid: ")
+              ;; (print uuid-from-session)
+              ;; (print "passed uuid: ")
+              ;; (print ,uuid)
+           (redirect (url-for :user-auth-form  :uuid ,uuid)))      ; redirect to login
+        ))))
 
 ;;
 ;; Routing rules
@@ -69,7 +150,8 @@
 (defun user-show (&key uuid)
   (try-authenticate-user uuid
     (let ((user (find-user-by-uuid uuid)))
-      (render-with-session #P"users/show.html" :user (for-template user)))))
+      ;;(render-with-session #P"users/show.html" :user (for-template user)))))
+      (render #P"users/show.html" (list :user (for-template user))))))
 
 
 ;;; Edit user
@@ -102,73 +184,15 @@
     (if (and user
              (authenticate-user user password))
         (progn
+          (print "user is authenticated")
           (add-user-to-session user)
-          (redirect (url-for :user-show uuid)))
+          (redirect (url-for :user-show :uuid uuid)))
         (progn
-          (redirect (url-for :user-auth-form uuid)))
-          ;;
-          )
-             )
-  ;;(let ((user (find-user-by-uuid uuid)))
-  ;;  (if (and user
-  ;;           (authenticate-user user password))
-  ;;      (add-user-to-session user)))
-  ;;(uuid-show uuid))
-  )
-
-(defun build-params (raw)
-  "Build a dict from the params cons list."
-  (let ((results (make-hash-table)))
-    (loop for param_pair in raw
-          do (progn
-               ;;(print (type-of (car param_pair)))
-               ;;(print (cdr param_pair))
-               (setf (gethash (intern
-                               (string-upcase
-                                (string (car param_pair)))) results)
-                     (cdr param_pair))))
-    results))
+          (print "wrong password!")
+          (with-flash :error "incorrect passowrd"
+            (redirect (url-for :user-auth-form :uuid uuid)))))))
 
 
-(defun add-user-to-session (user)
-  (setf (gethash :current_uuid *session*) (user-uuid user))
-  (setf (gethash :ttl *session*) 100))
-
-(defun set-current-user-from-session ()
-  (let ((user (find-user-by-uuid
-               (gethash :current_uuid *session*))))
-    (setf *current-user* user)))
-
-(defun try-expire-session ()
-  "If there is a user in the session decrememt the ttl.
-   If the ttl is below 0 expire the session."
-  (let ((ttl (gethash :ttl *session*)))
-    (if ttl
-        (if (< ttl 0)
-            (progn                          ; clear the session
-              (setf (gethash :current_uuid *session*) nil)
-              (setf (gethash :ttl *session*) nil))
-            (decf (gethash :ttl *session*))))))
-
-
-(defmacro try-authenticate-user (uuid &body body)
-  "Check session user against current action"
-  `(progn
-     (try-expire-session)
-     ;; page is open
-     ;; - render page
-     ;; page is closed
-     ;; - if session user is page user
-     ;; -- render page
-     ;; - if seesion user is not page user
-     ;; -- redirect
-     (let ((user-for-page (find-user-by-uuid ,uuid))
-            (uuid-from-session (gethash :current_uuid *session* nil)))
-        (if (or (not (user-requires-auth-p user-for-page))
-                (eq ,uuid uuid-from-session))
-            ,@body                                   ; render
-           (redirect (url-for :user-auth-form ,uuid))      ; redirect to login
-        ))))
 
 
 

@@ -1,5 +1,6 @@
 {% extends "layouts/default.html" %}
 
+{% block content %}
 <h1>Authenticating as {{ uuid }}</h1>
 
 <p>The user {{ uuid }} requires a password.</p>
@@ -10,3 +11,4 @@
   </label>
   <input type="submit" value="Go!" />
 </form>
+{% endblock %}
