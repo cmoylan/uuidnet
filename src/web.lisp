@@ -36,21 +36,17 @@
   ;; add flash to list of rendered vars
   (let ((session-params (list :current-user *current-user*)))
     (if *flash*
-        (progn
-          (print "getting here")
-        (setf session-params (append session-params (list :flash *flash*))))
-        )
-    (render template (append args session-params))
-    )
-  )
+          (setf session-params (append session-params
+                                       (list :flash-type (string-downcase (first *flash*))
+                                             :flash-message (second *flash*)))))
+    (render template (append args session-params))))
 
 
 (defmacro with-flash (type message &body body)
+  "Set a flash message"
   `(progn
      (setf *flash* (list ,type ,message))
-     ,@body
-     )
-  )
+     ,@body))
 
 ;;; Authentication
 ;;;
@@ -94,8 +90,6 @@
     results))
 
 
-;;; does this have to be a macro???
-;; *session* seems to be unavailable when this macro is compiled/expanded
 (defmacro try-authenticate-user (uuid &body body)
   "Check session user against current action"
   `(progn
@@ -112,22 +106,7 @@
         (if (or (not (user-requires-auth-p user-for-page))
                 (string= ,uuid uuid-from-session))
             ,@body                                   ; render
-            (progn
-              ;; (print "condision: ")
-              ;; (print (or (not (user-requires-auth-p user-for-page))
-              ;;   (eq ,uuid uuid-from-session)))
-
-              ;;  (print "uuid is uuid from sesh: ")
-              ;;  (print (eq ,uuid uuid-from-session))
-
-
-              ;; (print "redirecting inside try-auth")
-              ;; (print "sesh uuid: ")
-              ;; (print uuid-from-session)
-              ;; (print "passed uuid: ")
-              ;; (print ,uuid)
-           (redirect (url-for :user-auth-form  :uuid ,uuid)))      ; redirect to login
-        ))))
+           (redirect (url-for :user-auth-form  :uuid ,uuid)))))) ; redirect to login
 
 ;;
 ;; Routing rules
@@ -150,8 +129,9 @@
 (defun user-show (&key uuid)
   (try-authenticate-user uuid
     (let ((user (find-user-by-uuid uuid)))
-      ;;(render-with-session #P"users/show.html" :user (for-template user)))))
-      (render #P"users/show.html" (list :user (for-template user))))))
+      (with-flash :info "testing the flash"
+        (render-with-session #P"users/show.html" :user (for-template user))))))
+      ;(render #P"users/show.html" (list :user (for-template user))))))
 
 
 ;;; Edit user

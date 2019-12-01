@@ -6,8 +6,10 @@
   <link rel="stylesheet" type="text/css" media="screen" href="/css/main.css">
 </head>
 <body>
-  {% if flash %}
-  {{ flash }}
+  {% if flash-message %}
+  <div class="flash {{flash-type}}">
+    {{ flash-message }}
+  </div>
   {% endif %}
 
   {% block content %}{% endblock %}
