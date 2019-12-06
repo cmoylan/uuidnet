@@ -52,13 +52,14 @@
          ((id :type 'serial :primary-key t)
           (sender_id :type 'int :not-null t)
           (recipient_id :type 'int :not-null t)
+          (reply_id :type 'int :not-null t)
           (body :type 'text :not-null t)
           (created_at :type 'timestamp :not-null t)
           (updated_at :type 'timestamp :not-null t))))))
 
+
 (defun drop-all-tables ()
   "Drop all tables from the database."
-
   (with-connection (db)
     (execute
      (drop-table :users :if-exists t)

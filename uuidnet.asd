@@ -34,16 +34,9 @@
                  (:file "config")
                  (:file "schema" :depends-on ("db"))
 
-
                  (:module "models"
                   :components
-                  ((:file "message"))
-                  )
-                 )))
+                  ((:file "message"))))))
 
-               ;;;(:module "db"
-               ;;;         :pathname "db"
-               ;;;         :components
-               ;;;         ((:file "schema" :depends-on ("src")))))
   :description ""
   :in-order-to ((test-op (test-op "uuidnet-test"))))

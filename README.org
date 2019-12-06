@@ -14,10 +14,13 @@
 
 
 * Current tasks
-** TODO Move db component into src/db
 ** TODO allow someone to claim a uuid by entering a password
 ** TODO Fix imports in web.lisp
+** TODO break out auth code from web
 ** TODO messages
+** TODO move user into its own model
+** KILL Move db component into src/db
+CLOSED: [2019-12-06 Fri 07:08]
 ** DONE create /users endpoint
 CLOSED: [2019-12-05 Thu 23:59]
 ** DONE logout

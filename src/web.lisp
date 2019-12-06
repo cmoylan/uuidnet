@@ -136,7 +136,6 @@
                                           (all-users))))
 
 
-;;;
 ;;; Show user
 @route GET "/u/:uuid"
 (defun user-show (&key uuid)
@@ -158,7 +157,10 @@
   )
 
 
-
+@route POST "/users"
+(defun user-create ()
+  "Create an open user."
+  )
 ;;; --- Authentication routes --- ;;;
 
 ;;; Auth form
