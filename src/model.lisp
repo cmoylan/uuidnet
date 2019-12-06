@@ -73,12 +73,14 @@
 
 (defun add-open-user ()
   "Add a user without a password."
-  (with-connection (db)
-    (execute
-     (insert-into :users
-                  (set= :uuid (generate-uuid)
-                        :created_at (local-time:now)
-                        :updated_at (local-time:now))))))
+  (let ((uuid (generate-uuid)))
+    (with-connection (db)
+      (execute
+       (insert-into :users
+         (set= :uuid uuid
+               :created_at (local-time:now)
+               :updated_at (local-time:now)))))
+    (find-user-by-uuid uuid)))
 
 
 (defun generate-uuid ()

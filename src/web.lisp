@@ -160,22 +160,24 @@
 @route POST "/users"
 (defun user-create ()
   "Create an open user."
-  )
+  (let ((new_user (add-open-user)))
+  (redirect (url-for :user-show :uuid (user-uuid new_user)))))
+
+
 ;;; --- Authentication routes --- ;;;
 
-;;; Auth form
 @route GET "/u/:uuid/auth"
 (defun user-auth-form (&key uuid)
+  "Show the auth form for a user"
   (render #P"users/auth.html" (list :uuid uuid)))
 
 
-;;; Authenticate uuid
 @route POST "/u/:uuid/auth"
 (defun user-auth (&key uuid _parsed)
+  "Handle the submission of the auth form"
   (let* ((params (build-params _parsed))
         (password (gethash (intern "PASSWORD") params))
         (user (find-user-by-uuid uuid)))
-
     (if (and user
              (authenticate-user user password))
         (progn
