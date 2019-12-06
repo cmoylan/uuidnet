@@ -33,8 +33,10 @@
 
 
 (defun render-with-session (template &rest args)
-  ;; add flash to list of rendered vars
-  (let ((session-params (list :current-user *current-user*)))
+  "Add flash and current-user to the template variables"
+  (let ((session-params (list :current-user
+                              (if *current-user*
+                                  (for-template *current-user*)))))
     (if *flash*
         (progn
           (setf session-params (append session-params
@@ -50,11 +52,18 @@
      (setf *flash* (list ,type ,message))
      ,@body))
 
+
 ;;; Authentication
 ;;;
 (defun add-user-to-session (user)
   (setf (gethash :current_uuid *session*) (uuidnet.model::user-uuid user))
   (setf (gethash :ttl *session*) 100))
+
+
+(defun clear-session ()
+  (setf (gethash :current_uuid *session*) nil)
+  (setf (gethash :ttl *session*) nil)
+  (setf *current-user* nil))
 
 
 (defun set-current-user-from-session ()
@@ -69,11 +78,8 @@
   (let ((ttl (gethash :ttl *session*)))
     (if ttl
         (if (< ttl 0)
-            (progn                          ; clear the session
-              (setf (gethash :current_uuid *session*) nil)
-              (setf (gethash :ttl *session*) nil))
-            (progn
-              (decf (gethash :ttl *session*)))))))
+            (clear-session)
+            (decf (gethash :ttl *session*))))))
 
 
 (defun build-params (raw)
@@ -105,7 +111,9 @@
             (uuid-from-session (gethash :current_uuid *session* nil)))
         (if (or (not (user-requires-auth-p user-for-page))
                 (string= ,uuid uuid-from-session))
-            ,@body                                   ; render
+            (progn
+              (set-current-user-from-session)
+              ,@body)                                   ; render
            (redirect (url-for :user-auth-form  :uuid ,uuid)))))) ; redirect to login
 
 ;;
@@ -113,7 +121,7 @@
 
 @route GET "/"
 (defun root ()
-  (render #P"index.html"))
+  (render-with-session #P"index.html"))
 
 
 ;;; --- User routes --- ;;;
@@ -121,10 +129,10 @@
 ;;; All users
 @route GET "/users"
 (defun user-index ()
-  (render #P"users/index.html" (list :user-uuids
+  (render-with-session #P"users/index.html" :user-uuids
                                      (map 'list
                                           #'user-uuid
-                                          (all-users)))))
+                                          (all-users))))
 
 
 ;;;
@@ -157,6 +165,7 @@
 (defun user-auth-form (&key uuid)
   (render #P"users/auth.html" (list :uuid uuid)))
 
+
 ;;; Authenticate uuid
 @route POST "/u/:uuid/auth"
 (defun user-auth (&key uuid _parsed)
@@ -175,6 +184,11 @@
           (with-flash :error "incorrect passowrd"
             (redirect (url-for :user-auth-form :uuid uuid)))))))
 
+
+@route GET "/logout"
+(defun user-logout ()
+  (clear-session)
+  (redirect (url-for :root)))
 
 
 
