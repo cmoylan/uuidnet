@@ -16,4 +16,10 @@
 (in-package :uuidnet.models.message)
 
 (defmodel message
-  id)
+  id
+  sender_id
+  recipient_id
+  reply_id
+  body
+  created_at
+  updated_at)

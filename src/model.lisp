@@ -10,8 +10,7 @@
                 :execute
                 :retrieve-all
                 :retrieve-one)
-  (:export :create-tables
-           :all-users
+  (:export :all-users
            :authenticate-user
            :find-user
            :find-user-by-uuid
@@ -20,8 +19,7 @@
            :add-open-user
            :seed-users
            :user-requires-auth-p
-           :user-uuid
-           ))
+           :user-uuid))
 
 (in-package :uuidnet.model)
 

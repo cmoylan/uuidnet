@@ -14,3 +14,7 @@ ps:
 db:
 	#psql -U postgres -h 0.0.0.0 -d uuidnet_dev
 	psql -U postgres -h localhost -d uuidnet_dev
+
+.PHONY: migrate
+migrate:
+	psql -U postgres -h localhost -d uuidnet_dev < db/schema.sql
