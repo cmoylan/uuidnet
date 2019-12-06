@@ -7,6 +7,7 @@
         :uuidnet.view
         :uuidnet.db
         :uuidnet.model
+        ;:uuidnet.models.message
         :datafly
         :sxql)
   ;; FIXME: view.render conflicts with a function in web also named render

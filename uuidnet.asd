@@ -32,7 +32,14 @@
                  (:file "db" :depends-on ("config"))
                  (:file "model" :depends-on ("db")) ;; model
                  (:file "config")
-                 (:file "schema" :depends-on ("db")))))
+                 (:file "schema" :depends-on ("db"))
+
+
+                 (:module "models"
+                  :components
+                  ((:file "message"))
+                  )
+                 )))
 
                ;;;(:module "db"
                ;;;         :pathname "db"
