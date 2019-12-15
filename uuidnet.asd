@@ -27,16 +27,16 @@
   :components ((:module "src"
                 :components
                 ((:file "main" :depends-on ("config" "view" "db"))
-                 (:file "web" :depends-on ("view" "model"))
+                 (:file "web" :depends-on ("view" "user" "message"))
                  (:file "view" :depends-on ("config"))
                  (:file "db" :depends-on ("config"))
                  (:file "model" :depends-on ("db")) ;; model
                  (:file "config")
                  (:file "schema" :depends-on ("db"))
+                 (:file "message" :depends-on ("db"))
+                 (:file "user" :depends-on ("db")))))
 
-                 (:module "models"
-                  :components
-                  ((:file "message"))))))
+
 
   :description ""
   :in-order-to ((test-op (test-op "uuidnet-test"))))

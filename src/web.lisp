@@ -6,14 +6,14 @@
         :uuidnet.config
         :uuidnet.view
         :uuidnet.db
-        :uuidnet.model
-        ;:uuidnet.models.message
+        :uuidnet.user
+        :uuidnet.message
         :datafly
         :sxql)
   ;; FIXME: view.render conflicts with a function in web also named render
   (:shadowing-import-from :uuidnet.view
                           :render)
-  (:shadowing-import-from :uuidnet.model :all-users)
+  (:shadowing-import-from :uuidnet.user :all-users)
   (:export :*web*))
 (in-package :uuidnet.web)
 
@@ -88,8 +88,6 @@
   (let ((results (make-hash-table)))
     (loop for param_pair in raw
           do (progn
-               ;;(print (type-of (car param_pair)))
-               ;;(print (cdr param_pair))
                (setf (gethash (intern
                                (string-upcase
                                 (string (car param_pair)))) results)
@@ -164,6 +162,13 @@
   (redirect (url-for :user-show :uuid (user-uuid new_user)))))
 
 
+@route POST "/messages"
+(defun message-create (&key _parsed)
+  ; needs to have some kind of user
+  (let ((params (build-params _parsed)))
+    ))
+
+
 ;;; --- Authentication routes --- ;;;
 
 @route GET "/u/:uuid/auth"
@@ -176,8 +181,8 @@
 (defun user-auth (&key uuid _parsed)
   "Handle the submission of the auth form"
   (let* ((params (build-params _parsed))
-        (password (gethash (intern "PASSWORD") params))
-        (user (find-user-by-uuid uuid)))
+         (password (gethash (intern "PASSWORD") params))
+         (user (find-user-by-uuid uuid)))
     (if (and user
              (authenticate-user user password))
         (progn

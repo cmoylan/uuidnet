@@ -1,6 +1,6 @@
 (in-package :cl-user)
 
-(defpackage uuidnet.models.message
+(defpackage uuidnet.message
   (:use :cl :sxql)
   (:import-from :uuidnet.db
                 :db
@@ -14,7 +14,7 @@
   (:export :add-message
            ))
 
-(in-package :uuidnet.models.message)
+(in-package :uuidnet.message)
 
 (defmodel message
   id
