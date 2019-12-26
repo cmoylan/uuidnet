@@ -11,7 +11,8 @@
                 :execute
                 :retrieve-all
                 :retrieve-one)
-  (:export :add-message
+  (:export :create-message
+           :find-messages-between
            ))
 
 (in-package :uuidnet.message)
@@ -26,7 +27,7 @@
   updated_at)
 
 
-(defun add-message (&key body sender_id recipient_id reply_id)
+(defun create-message (&key body sender_id recipient_id reply_id)
   (with-connection (db)
     (execute
      (insert-into :messages
@@ -64,3 +65,10 @@
        (where (:and (:= :sender_id sender_id)
                     (:= :recipient_id recipient_id))))
      :as 'message)))
+
+
+;; NOTE this is a composite query and could be moved out of this model
+(defun find-messages-between (&key sender_id recipient_id)
+  "Look up sent and received messages for a given user"
+  (list)
+  )

@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-       id          int PRIMARY KEY,
+       id          serial PRIMARY KEY,
        username    varchar(255) UNIQUE,
        email       varchar(255) UNIQUE,
        password    text,
@@ -11,10 +11,10 @@ CREATE TABLE IF NOT EXISTS users (
 
 
 CREATE TABLE IF NOT EXISTS messages (
-       id           int PRIMARY KEY,
+       id           serial PRIMARY KEY,
        sender_id    int NOT NULL,
        recipient_id int NOT NULL,
-       reply_id     int NOT NULL,
+       reply_id     int,
        body         text NOT NULL,
        created_at   timestamp NOT NULL,
        updated_at   timestamp NOT NULL

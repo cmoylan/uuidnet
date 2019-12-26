@@ -13,6 +13,7 @@
                 :*djula-execute-package*)
   (:import-from :datafly
                 :encode-json)
+  (:nicknames :view)
   (:export :render
            :render-json))
 (in-package :uuidnet.view)

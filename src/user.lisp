@@ -10,6 +10,7 @@
                 :execute
                 :retrieve-all
                 :retrieve-one)
+  (:nicknames :user)
   (:export :all-users
            :authenticate-user
            :find-user
@@ -19,7 +20,9 @@
            :add-open-user
            :seed-users
            :user-requires-auth-p
-           :user-uuid))
+           :user-uuid
+           :password-set-p
+           :user-id))
 
 (in-package :uuidnet.user)
 
@@ -34,7 +37,7 @@
 
 
 (defun seed-users ()
-  "Create some test users."
+  "Create some test users"
   (add-user "cmoylan" "cmoylan@example.com" "abc123")
   )
 
@@ -44,7 +47,12 @@
   (list :email (user-email user)
     :uuid (user-uuid user)
     :username (user-username user)
-    :password-set (not (null (user-password user)))  ))
+    :password-set (password-set-p user)))
+
+
+(defun password-set-p (user)
+  "return a boolean indicating if the user has a password"
+  (not (null (user-password user))))
 
 
 (defun all-users ()
@@ -57,7 +65,7 @@
 
 
 (defun add-user (username email password)
-  "add user record to database."
+  "add user record to database"
   (with-connection (db)
     (execute
      (insert-into :users
@@ -70,7 +78,7 @@
 
 
 (defun add-open-user ()
-  "Add a user without a password."
+  "Add a user without a password"
   (let ((uuid (generate-uuid)))
     (with-connection (db)
       (execute
@@ -89,7 +97,7 @@
         new-uuid)))
 
 (defun find-user-by-username (username)
-  "lookup user record by username."
+  "lookup user record by username"
   (with-connection (db)
     (retrieve-one
      (select :*
@@ -99,7 +107,7 @@
 
 
  (defun find-user-by-email (email)
-   "lookup user record by email."
+   "lookup user record by email"
    (with-connection (db)
      (retrieve-one
        (select :* (from :users)
@@ -108,7 +116,7 @@
 
 
  (defun find-user-by-uuid (uuid)
-  "lookup user record by uuid."
+  "lookup user record by uuid"
   (if uuid
     (with-connection (db)
       (retrieve-one
@@ -118,7 +126,7 @@
 
 
 (defun find-user (identifier)
-   "lookup user record by username or email."
+   "lookup user record by username or email"
    (or (find-user-by-username identifier)
        (find-user-by-email identifier)
        (find-user-by-uuid identifier)))

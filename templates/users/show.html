@@ -3,16 +3,30 @@
 {% block content %}
 
 {% if user.password-set %}
-<p>Welcome back!</p>
+<p>This profile is claimed</p>
 {% else %}
 <p>This profile is open. You can claim it by setting a password.</p>
+
+{% if not current-user %}
+<form method="POST" action="/u/{{ user.uuid }}/login">
+  <input type="submit" value="Login as user {{ user.uuid }}" />
+</form>
+{% endif %}
 {% endif %}
 
 
 <ul>
-<li>Email: {{ user.email }}</li>
-<li>UUID: {{ user.uuid }}</li>
-<li>username: {{ user.username }}</li>
+  <li>Email: {{ user.email }}</li>
+  <li>UUID: {{ user.uuid }}</li>
+  <li>username: {{ user.username }}</li>
 </ul>
+
+
+{% if current-user %}
+<form method="POST" action="/u/{{ current-user.uuid }}/messages">
+  <textarea name="message-body"></textarea>
+  <input type="submit" value="Send" />
+</form>
+{% endif %}
 
 {% endblock %}

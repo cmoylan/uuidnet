@@ -10,18 +10,13 @@
         :uuidnet.message
         :datafly
         :sxql)
-  ;; FIXME: view.render conflicts with a function in web also named render
-  (:shadowing-import-from :uuidnet.view
-                          :render)
-  (:shadowing-import-from :uuidnet.user :all-users)
   (:export :*web*))
 (in-package :uuidnet.web)
+
 
 ;; for @route annotation
 (syntax:use-syntax :annot)
 
-;; Get a value of Referer header.
-;;(http-referer *request*)
 
 ;;
 ;; Application
@@ -37,14 +32,14 @@
   "Add flash and current-user to the template variables"
   (let ((session-params (list :current-user
                               (if *current-user*
-                                  (for-template *current-user*)))))
+                                  (user:for-template *current-user*)))))
     (if *flash*
         (progn
           (setf session-params (append session-params
                                        (list :flash-type (string-downcase (first *flash*))
                                              :flash-message (second *flash*))))
           (setf *flash* nil)))
-    (render template (append args session-params))))
+    (view:render template (append args session-params))))
 
 
 (defmacro with-flash (type message &body body)
@@ -57,7 +52,7 @@
 ;;; Authentication
 ;;;
 (defun add-user-to-session (user)
-  (setf (gethash :current_uuid *session*) (uuidnet.model::user-uuid user))
+  (setf (gethash :current_uuid *session*) (uuidnet.user:user-uuid user))
   (setf (gethash :ttl *session*) 100))
 
 
@@ -115,6 +110,24 @@
               ,@body)                                   ; render
            (redirect (url-for :user-auth-form  :uuid ,uuid)))))) ; redirect to login
 
+(defun require-user ()
+  (if (not *current-user*)
+      (let ((referer (gethash "referer" (request-headers *request*))))
+        (with-flash :error "Please sign in"
+          (redirect (or referer (url-for :root)))))))
+
+
+@route GET "/referer"
+(defun refer-test ()
+  (gethash "referer" (request-headers *request*)))
+
+
+@route GET "/login-test"
+(defun login-test ()
+  (require-user)
+  "you are signed in")
+
+
 ;;
 ;; Routing rules
 
@@ -131,7 +144,7 @@
   (render-with-session #P"users/index.html" :user-uuids
                                      (map 'list
                                           #'user-uuid
-                                          (all-users))))
+                                          (user:all-users))))
 
 
 ;;; Show user
@@ -139,8 +152,8 @@
 (defun user-show (&key uuid)
   (try-authenticate-user uuid
     (let ((user (find-user-by-uuid uuid)))
-      ;(with-flash :info "testing the flash"
-        (render-with-session #P"users/show.html" :user (for-template user)))));)
+          ;(messages (find-messages-for-uuid uuid)))
+      (render-with-session #P"users/show.html" :user (user:for-template user)))))
 
 
 ;;; Edit user
@@ -162,19 +175,41 @@
   (redirect (url-for :user-show :uuid (user-uuid new_user)))))
 
 
-@route POST "/messages"
-(defun message-create (&key _parsed)
-  ; needs to have some kind of user
-  (let ((params (build-params _parsed)))
-    ))
+;;; --- Message routes --- ;;;
 
+;;; Create message
+;; TODO need to handle if create-message fails
+@route POST "/u/:uuid/messages"
+(defun message-create (&key uuid _parsed)
+  (require-user)
+  (let ((params (build-params _parsed))
+        (recipient (find-user-by-uuid uuid)))
+    (create-message :body (gethash (intern "MESSAGE-BODY") params)
+                    :sender_id (user-id *current-user*)
+                    :recipient_id (user-id recipient)
+                    :reply_id nil)
+    (redirect (url-for :user-show :uuid uuid))))
+
+
+@route GET "/u/:uuid/messages"
+(defun message-show (&key uuid)
+  "Show messages between the uuid and current-user"
+  (require-user)
+  (let* ((user (find-user-by-uuid uuid))
+         (messages (find-messages-between :sender_id (user-id *current-user*)
+                                          :recipient_id (user-id user))))
+    ; TODO for-template will conflict with user:for-template
+                ; figure out how to namespace or classify
+    (render-with-session #P"messages/show.html" :messages (list messages))
+    )
+  )
 
 ;;; --- Authentication routes --- ;;;
 
 @route GET "/u/:uuid/auth"
 (defun user-auth-form (&key uuid)
   "Show the auth form for a user"
-  (render #P"users/auth.html" (list :uuid uuid)))
+  (view:render #P"users/auth.html" (list :uuid uuid)))
 
 
 @route POST "/u/:uuid/auth"
@@ -195,11 +230,20 @@
             (redirect (url-for :user-auth-form :uuid uuid)))))))
 
 
+@route POST "/u/:uuid/login"
+(defun user-login (&key uuid)
+  "Login as an open user"
+  (let ((user (user:find-user-by-uuid uuid)))
+    (if (not (user:password-set-p user))
+        (progn (add-user-to-session user)
+               (redirect (url-for :user-show :uuid uuid)))
+        (redirect (url-for :user-auth-form :uuid uuid)))))
+
+
 @route GET "/logout"
 (defun user-logout ()
   (clear-session)
   (redirect (url-for :root)))
-
 
 
 
