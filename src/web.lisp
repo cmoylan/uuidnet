@@ -32,7 +32,7 @@
   "Add flash and current-user to the template variables"
   (let ((session-params (list :current-user
                               (if *current-user*
-                                  (user:for-template *current-user*)))))
+                                  (user-for-template *current-user*)))))
     (if *flash*
         (progn
           (setf session-params (append session-params
@@ -153,7 +153,7 @@
   (try-authenticate-user uuid
     (let ((user (find-user-by-uuid uuid)))
           ;(messages (find-messages-for-uuid uuid)))
-      (render-with-session #P"users/show.html" :user (user:for-template user)))))
+      (render-with-session #P"users/show.html" :user (user-for-template user)))))
 
 
 ;;; Edit user
@@ -198,11 +198,9 @@
   (let* ((user (find-user-by-uuid uuid))
          (messages (find-messages-between :sender_id (user-id *current-user*)
                                           :recipient_id (user-id user))))
-    ; TODO for-template will conflict with user:for-template
-                ; figure out how to namespace or classify
-    (render-with-session #P"messages/show.html" :messages (list messages))
-    )
-  )
+    (render-with-session #P"messages/show.html" :messages (map 'list #'message-for-template messages))))
+    ;(render-with-session #P"messages/show.html" :messages (list messages))))
+
 
 ;;; --- Authentication routes --- ;;;
 

@@ -15,7 +15,7 @@
            :authenticate-user
            :find-user
            :find-user-by-uuid
-           :for-template
+           :user-for-template
            :add-user
            :add-open-user
            :seed-users
@@ -42,7 +42,7 @@
   )
 
 
-(defun for-template (user)
+(defun user-for-template (user)
   "transform the user struct into an alist"
   (list :email (user-email user)
     :uuid (user-uuid user)

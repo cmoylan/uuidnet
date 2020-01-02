@@ -11,20 +11,22 @@
                 :execute
                 :retrieve-all
                 :retrieve-one)
+  (:nicknames :message)
   (:export :create-message
            :find-messages-between
+           :message-for-template
            ))
 
 (in-package :uuidnet.message)
 
 (defmodel message
   id
-  sender_id
-  recipient_id
-  reply_id
+  sender-id
+  recipient-id
+  reply-id
   body
-  created_at
-  updated_at)
+  created-at
+  updated-at)
 
 
 (defun create-message (&key body sender_id recipient_id reply_id)
@@ -43,7 +45,7 @@
   (with-connection (db)
     (retrieve-all
      (select :*
-        (from :messages)
+      (from :messages)
        (where (:= :sender_id sender_id)))
      :as 'message)))
 
@@ -52,23 +54,28 @@
   (with-connection (db)
     (retrieve-all
      (select :*
-        (from :messages)
+      (from :messages)
        (where (:= :reply_id message_id)))
      :as 'message)))
 
 
-(defun find-messages-by-sender-recipient (sender_id recipient_id)
+(defun find-messages-between (&key sender_id recipient_id)
+  "look up messages between two users"
   (with-connection (db)
     (retrieve-all
      (select :*
-        (from :messages)
+      (from :messages)
        (where (:and (:= :sender_id sender_id)
                     (:= :recipient_id recipient_id))))
      :as 'message)))
 
 
-;; NOTE this is a composite query and could be moved out of this model
-(defun find-messages-between (&key sender_id recipient_id)
-  "Look up sent and received messages for a given user"
-  (list)
-  )
+(defun message-for-template (message)
+  "transform the messages struct into an alist"
+  (print "---------")
+  (print (message-created-at message))
+  (list :sender_id (message-sender-id message)
+    :recipient_id (message-recipient-id message)
+    :reply_id (message-reply-id message)
+    :body (message-body message)
+    :created_at (message-created-at message)))
