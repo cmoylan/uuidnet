@@ -7,6 +7,7 @@
                 :with-connection
                 :with-transaction)
   (:import-from :datafly
+                :defmodel
                 :execute
                 :retrieve-all
                 :retrieve-one)
@@ -26,7 +27,7 @@
 
 (in-package :uuidnet.user)
 
-(defstruct user
+(defmodel user
   id
   username
   uuid

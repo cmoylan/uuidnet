@@ -1,8 +1,19 @@
 {% extends "layouts/default.html" %}
 
 {% block content %}
-messages between current user and uuid
+<p>messages between current user and uuid</p>
 
-{{ messages }}
+<h2>Messages</h2>
+<ul>
+{% for message in messages %}
+  <li>
+    <span>From:</span>{{ message.sender_id }}<br />
+    <span>To:</span>{{ message.recipient_id }}<br />
+    <span>Body:</span>
+    <p>{{ message.body }}</p>
+    <p>Sent: {{ message.created_at | date }}</p>
+  </li>
+{% endfor %}
+</ul>
 
 {% endblock %}

@@ -117,7 +117,7 @@
           (redirect (or referer (url-for :root)))))))
 
 
-@route GET "/referer"
+@route GET "/referer-test"
 (defun refer-test ()
   (gethash "referer" (request-headers *request*)))
 
@@ -127,6 +127,15 @@
   (require-user)
   "you are signed in")
 
+@route GET "/flash-notice-test"
+(defun flash-notice-test ()
+  (with-flash :notice "test flash message"
+              (redirect (url-for :user-index))))
+
+@route GET "/flash-error-test"
+(defun flash-error-test ()
+  (with-flash :error "test flash message"
+              (redirect (url-for :user-index))))
 
 ;;
 ;; Routing rules
@@ -199,7 +208,6 @@
          (messages (find-messages-between :sender_id (user-id *current-user*)
                                           :recipient_id (user-id user))))
     (render-with-session #P"messages/show.html" :messages (map 'list #'message-for-template messages))))
-    ;(render-with-session #P"messages/show.html" :messages (list messages))))
 
 
 ;;; --- Authentication routes --- ;;;

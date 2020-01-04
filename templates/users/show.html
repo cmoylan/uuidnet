@@ -23,7 +23,9 @@
 
 
 {% if current-user %}
-<form method="POST" action="/u/{{ current-user.uuid }}/messages">
+<a href="/u/{{ user.uuid }}/messages">public messages</a>
+
+<form method="POST" action="/u/{{ user.uuid }}/messages">
   <textarea name="message-body"></textarea>
   <input type="submit" value="Send" />
 </form>

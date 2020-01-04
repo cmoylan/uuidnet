@@ -72,8 +72,6 @@
 
 (defun message-for-template (message)
   "transform the messages struct into an alist"
-  (print "---------")
-  (print (message-created-at message))
   (list :sender_id (message-sender-id message)
     :recipient_id (message-recipient-id message)
     :reply_id (message-reply-id message)
