@@ -15,12 +15,18 @@
 
 * Current tasks
 ** TODO allow someone to claim a uuid by entering a password
-** TODO Fix imports in web.lisp
 ** TODO break out auth code from web
 ** TODO messages
-** TODO move user into its own model
+*** [ ] create a message view
+** TODO set up vue
+** TODO add css-grid layout
+** TODO another round of styling
 ** KILL Move db component into src/db
 CLOSED: [2019-12-06 Fri 07:08]
+** DONE Fix imports in web.lisp
+CLOSED: [2020-01-02 Thu 11:56]
+** DONE move user into its own model
+CLOSED: [2020-01-02 Thu 11:57]
 ** DONE create /users endpoint
 CLOSED: [2019-12-05 Thu 23:59]
 ** DONE logout

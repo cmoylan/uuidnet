@@ -28,7 +28,7 @@ h1 {
 }
 
 a {
-  color: var(--accent);
+  color: var(--compliment);
 }
 
 main {
@@ -58,6 +58,11 @@ header {
 
 nav {
   background: #cbded0;
+  /*
+  background: #ded0cb;
+  background: #d0cbde;
+  background: #e9dce6;*/
+  */
 }
 
 dialog.flash {
