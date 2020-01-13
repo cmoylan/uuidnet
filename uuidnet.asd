@@ -34,7 +34,11 @@
                  (:file "config")
                  (:file "schema" :depends-on ("db"))
                  (:file "message" :depends-on ("db"))
-                 (:file "user" :depends-on ("db")))))
+                 (:file "user" :depends-on ("db" "utilities"))
+                 (:module "utilities"
+                          :components
+                          ((:file "nickname")))
+                 )))
 
 
 

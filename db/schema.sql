@@ -19,3 +19,5 @@ CREATE TABLE IF NOT EXISTS messages (
        created_at   timestamp NOT NULL,
        updated_at   timestamp NOT NULL
 );
+
+ALTER TABLE users ADD COLUMN nickname text UNIQUE;

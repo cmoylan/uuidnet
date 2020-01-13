@@ -11,6 +11,8 @@
                 :execute
                 :retrieve-all
                 :retrieve-one)
+  (:import-from :uuidnet.utilities.nickname
+                :make-nickname)
   (:nicknames :user)
   (:export :all-users
            :authenticate-user
@@ -74,6 +76,7 @@
              :email email
              :password (cl-pass:hash password)
              :uuid (generate-uuid)
+             :nickname (generate-nickname)
              :created_at (local-time:now)
              :updated_at (local-time:now))))))
 
@@ -97,6 +100,33 @@
         (generate-uuid)
         new-uuid)))
 
+
+(defun generate-nickname ()
+  "return a reasonably-unique nickname"
+  (let ((new-nickname (make-nickname)))
+    (if (find-user-by-nickname new-nickname)
+        (generate-nickname)
+        new-nickname)))
+
+
+(defun find-user-by-email (email)
+  "lookup user record by email"
+  (with-connection (db)
+    (retrieve-one
+      (select :* (from :users)
+              (where (:= :email email)))
+      :as 'user)))
+
+
+(defun find-user-by-nickname (nickname)
+  "lookup user record by nickname"
+  (with-connection (db)
+    (retrieve-one
+      (select :* (from :users)
+              (where (:= nickname nickname)))
+      :as 'user)))
+
+
 (defun find-user-by-username (username)
   "lookup user record by username"
   (with-connection (db)
@@ -105,15 +135,6 @@
         (from :users)
        (where (:= :username username)))
      :as 'user)))
-
-
- (defun find-user-by-email (email)
-   "lookup user record by email"
-   (with-connection (db)
-     (retrieve-one
-       (select :* (from :users)
-               (where (:= :email email)))
-       :as 'user)))
 
 
  (defun find-user-by-uuid (uuid)
