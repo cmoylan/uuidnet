@@ -13,12 +13,13 @@
 
   <nav class="top-nav">
     {% if current-user %}
-    Signed in as {{ current-user.uuid }}
-    <form action="/logout" method="GET">
-      <input type="submit" value="logout">
-    </form>
+    Signed in as {{ current-user.username }}
+    <a href="/logout">logout</a>
     {% endif %}
   </nav>
+
+  {% block breadcrumb %}
+  {% endblock %}
 
 
   {% if flash-message %}

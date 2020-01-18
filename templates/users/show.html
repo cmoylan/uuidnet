@@ -1,9 +1,25 @@
 {% extends "layouts/default.html" %}
 
+{% block header %}
+<h1>User - {{ user.username }}</h1>
+{% endblock %}
+
+
+{% block breadcrumb %}
+<a href="/">home</a> /
+<a href="/users">users</a> /
+{{ user.username }}
+{% endblock %}
+
+
 {% block content %}
 
 {% if user.password-set %}
 <p>This profile is claimed</p>
+{% if not current-user %}
+<a href="/u/{{ user.uuid }}/auth">Login as {{ user.username }}</a>
+{% endif %}
+
 {% else %}
 <p>This profile is open. You can claim it by setting a password.</p>
 
@@ -14,9 +30,12 @@
 {% endif %}
 {% endif %}
 
+{% ifequal current-user.uuid user.uuid %}
+current user is this user
+{% endifequal %}
+
 
 <ul>
-  <li>Email: {{ user.email }}</li>
   <li>UUID: {{ user.uuid }}</li>
   <li>username: {{ user.username }}</li>
 </ul>

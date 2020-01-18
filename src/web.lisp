@@ -110,6 +110,7 @@
               ,@body)                                   ; render
            (redirect (url-for :user-auth-form  :uuid ,uuid)))))) ; redirect to login
 
+
 (defun require-user ()
   (if (not *current-user*)
       (let ((referer (gethash "referer" (request-headers *request*))))
@@ -117,22 +118,22 @@
           (redirect (or referer (url-for :root)))))))
 
 
-@route GET "/referer-test"
+@route GET "/tests/referer"
 (defun refer-test ()
   (gethash "referer" (request-headers *request*)))
 
 
-@route GET "/login-test"
+@route GET "/tests/login"
 (defun login-test ()
   (require-user)
   "you are signed in")
 
-@route GET "/flash-notice-test"
+@route GET "/tests/flash/notice"
 (defun flash-notice-test ()
   (with-flash :notice "test flash message"
               (redirect (url-for :user-index))))
 
-@route GET "/flash-error-test"
+@route GET "/tests/flash/error"
 (defun flash-error-test ()
   (with-flash :error "test flash message"
               (redirect (url-for :user-index))))
@@ -150,30 +151,29 @@
 ;;; All users
 @route GET "/users"
 (defun user-index ()
-  (render-with-session #P"users/index.html" :user-uuids
+  (render-with-session #P"users/index.html" :user-usernames
                                      (map 'list
-                                          #'user-uuid
+                                          #'user-username
                                           (user:all-users))))
 
 
 ;;; Show user
-@route GET "/u/:uuid"
-(defun user-show (&key uuid)
-  (try-authenticate-user uuid
-    (let ((user (find-user-by-uuid uuid)))
-          ;(messages (find-messages-for-uuid uuid)))
-      (render-with-session #P"users/show.html" :user (user-for-template user)))))
+@route GET "/u/:identifier"
+(defun user-show (&key identifier)
+  ;(try-authenticate-user uuid
+    (let ((user (find-user-by-public-identifier uuid)))
+      (render-with-session #P"users/show.html" :user (user-for-template user))));)
 
 
 ;;; Edit user
-@route GET "/u/:uuid/edit"
-(defun user-edit (&key uuid)
+@route GET "/u/:identifier/edit"
+(defun user-edit (&key identifier)
   "user edit")
 
 
 ;;; Update user
-@route POST "/u/:uuid"
-(defun user-update (&key uuid)
+@route POST "/u/:identifier"
+(defun user-update (&key identifier)
   )
 
 
@@ -188,29 +188,30 @@
 
 ;;; Create message
 ;; TODO need to handle if create-message fails
-@route POST "/u/:uuid/messages"
-(defun message-create (&key uuid _parsed)
+@route POST "/u/:identifier/messages"
+(defun message-create (&key identifier _parsed)
   (require-user)
   (let ((params (build-params _parsed))
-        (recipient (find-user-by-uuid uuid)))
+        (recipient (find-user-by-public-identifier identifier)))
     (create-message :body (gethash (intern "MESSAGE-BODY") params)
                     :sender_id (user-id *current-user*)
                     :recipient_id (user-id recipient)
                     :reply_id nil)
-    (redirect (url-for :user-show :uuid uuid))))
+    (redirect (url-for :user-show :identifier identifier))))
 
 
-@route GET "/u/:uuid/messages"
-(defun message-show (&key uuid)
-  "Show messages between the uuid and current-user"
+@route GET "/u/:identifier/messages"
+(defun message-show (&key identifier)
+  "Show messages between the requested and current user"
   (require-user)
-  (let* ((user (find-user-by-uuid uuid))
+  (let* ((user (find-user-by-public-identifier identifier))
          (messages (find-messages-between :sender_id (user-id *current-user*)
                                           :recipient_id (user-id user))))
     (render-with-session #P"messages/show.html" :messages (map 'list #'message-for-template messages))))
 
 
 ;;; --- Authentication routes --- ;;;
+;;; These will all use uuid as the identifier for now
 
 @route GET "/u/:uuid/auth"
 (defun user-auth-form (&key uuid)

@@ -4,12 +4,19 @@
 <h1>Users</h1>
 {% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="/">home</a> /
+  users
+</nav>
+{% endblock %}
+
 {% block content %}
 
 <ul>
-{% for uuid in user-uuids %}
+{% for username in user-usernames %}
 <li>
-  <a href="/u/{{ uuid }}">{{ uuid }}</a>
+  <a href="/u/{{ username }}">{{ username }}</a>
 </li>
 {% endfor %}
 </ul>

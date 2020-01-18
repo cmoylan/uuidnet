@@ -1,8 +1,11 @@
 {% extends "layouts/default.html" %}
 {% block title %}Welcome to Caveman2{% endblock %}
-{% block content %}
-<div id="main">
+
+{% block header %}
   <h1>uuidnet</h1>
-  <p>Welcome to <a href="http://8arrow.org/caveman/">Caveman2</a>!</p>
-</div>
+{% endblock %}
+
+{% block content %}
+  <p>The uuidnet</p>
+  <a href="/users">Users</a>
 {% endblock %}

@@ -21,6 +21,7 @@
 
                ;; hashing password
                "cl-pass"
+
                ;; generate unique identifiers
                "uuid"
                )

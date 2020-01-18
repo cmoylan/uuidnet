@@ -56,13 +56,13 @@ header {
 
 }
 
-nav {
+nav.top-nav {
   background: #cbded0;
-  /*
+  padding: 0.25rem;
+}
+nav.breadcrumb {
   background: #ded0cb;
-  background: #d0cbde;
-  background: #e9dce6;*/
-  */
+  padding: 0.25rem;
 }
 
 dialog.flash {

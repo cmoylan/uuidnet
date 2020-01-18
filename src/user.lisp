@@ -18,6 +18,7 @@
            :authenticate-user
            :find-user
            :find-user-by-uuid
+           :find-user-by-public-identifier
            :user-for-template
            :add-user
            :add-open-user
@@ -41,7 +42,7 @@
 
 (defun seed-users ()
   "Create some test users"
-  (add-user "cmoylan" "cmoylan@example.com" "abc123")
+  (add-user "cmoylan@example.com" "abc123")
   )
 
 
@@ -67,27 +68,28 @@
      :as 'user)))
 
 
-(defun add-user (username email password)
+(defun add-user (email password)
   "add user record to database"
   (with-connection (db)
     (execute
      (insert-into :users
-       (set= :username username
-             :email email
+       (set= :email email
              :password (cl-pass:hash password)
              :uuid (generate-uuid)
-             :nickname (generate-nickname)
+             :username (generate-username)
              :created_at (local-time:now)
              :updated_at (local-time:now))))))
 
 
 (defun add-open-user ()
   "Add a user without a password"
-  (let ((uuid (generate-uuid)))
+  (let ((uuid (generate-uuid))
+        (username (generate-username)))
     (with-connection (db)
       (execute
        (insert-into :users
          (set= :uuid uuid
+               :username username
                :created_at (local-time:now)
                :updated_at (local-time:now)))))
     (find-user-by-uuid uuid)))
@@ -101,12 +103,13 @@
         new-uuid)))
 
 
-(defun generate-nickname ()
-  "return a reasonably-unique nickname"
-  (let ((new-nickname (make-nickname)))
-    (if (find-user-by-nickname new-nickname)
-        (generate-nickname)
-        new-nickname)))
+;; TODO should raise an error if this tries 10 times without success
+(defun generate-username ()
+  "return a unique username"
+  (let ((new-username (make-nickname)))
+    (if (find-user-by-username new-username)
+        (generate-username)
+        new-username)))
 
 
 (defun find-user-by-email (email)
@@ -115,15 +118,6 @@
     (retrieve-one
       (select :* (from :users)
               (where (:= :email email)))
-      :as 'user)))
-
-
-(defun find-user-by-nickname (nickname)
-  "lookup user record by nickname"
-  (with-connection (db)
-    (retrieve-one
-      (select :* (from :users)
-              (where (:= nickname nickname)))
       :as 'user)))
 
 
@@ -147,8 +141,14 @@
        :as 'user))))
 
 
+(defun find-user-by-public-identifier (identifier)
+  "lookup user by a public identifier - username or uuid"
+  (or (find-user-by-username identifier)
+      (find-user-by-uuid identifier)))
+
+
 (defun find-user (identifier)
-   "lookup user record by username or email"
+   "lookup user record by username, email, or uuid"
    (or (find-user-by-username identifier)
        (find-user-by-email identifier)
        (find-user-by-uuid identifier)))

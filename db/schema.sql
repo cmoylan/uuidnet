@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
        id          serial PRIMARY KEY,
-       username    varchar(255) UNIQUE,
+       username    varchar(255) UNIQUE NOT NULL,
        email       varchar(255) UNIQUE,
        password    text,
        uuid        text UNIQUE NOT NULL,
@@ -20,4 +20,3 @@ CREATE TABLE IF NOT EXISTS messages (
        updated_at   timestamp NOT NULL
 );
 
-ALTER TABLE users ADD COLUMN nickname text UNIQUE;

@@ -2,7 +2,9 @@
 
 {% block content %}
 <h1>Authenticating as {{ uuid }}</h1>
+{% endblock content %}
 
+{% block content %}
 <p>The user {{ uuid }} requires a password.</p>
 
 <form method="post" action="/u/{{ uuid }}/auth">
