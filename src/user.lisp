@@ -25,6 +25,7 @@
            :seed-users
            :user-requires-auth-p
            :user-uuid
+           :user-username
            :password-set-p
            :user-id))
 

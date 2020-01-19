@@ -161,7 +161,7 @@
 @route GET "/u/:identifier"
 (defun user-show (&key identifier)
   ;(try-authenticate-user uuid
-    (let ((user (find-user-by-public-identifier uuid)))
+    (let ((user (find-user-by-public-identifier identifier)))
       (render-with-session #P"users/show.html" :user (user-for-template user))));)
 
 
@@ -243,7 +243,7 @@
   (let ((user (user:find-user-by-uuid uuid)))
     (if (not (user:password-set-p user))
         (progn (add-user-to-session user)
-               (redirect (url-for :user-show :uuid uuid)))
+               (redirect (url-for :user-show :identifier (user-username user))))
         (redirect (url-for :user-auth-form :uuid uuid)))))
 
 
