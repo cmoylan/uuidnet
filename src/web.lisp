@@ -241,6 +241,9 @@
         (progn
           (print "user is authenticated")
           (add-user-to-session user)
+          ;;; TODO: should do try-expire-user and set-user-from-session
+          ;;;       on every page...like a before_action
+          (set-current-user-from-session)
           (redirect (url-for :user-show :identifier identifier)))
         (progn
           (print "wrong password!")
@@ -254,6 +257,7 @@
   (let ((user (user:find-user-by-public-identifier identifier)))
     (if (not (user:password-set-p user))
         (progn (add-user-to-session user)
+               (set-current-user-from-session)
                (redirect (url-for :user-show :identifier (user-username user))))
         (redirect (url-for :user-auth-form :identifier identifier)))))
 
