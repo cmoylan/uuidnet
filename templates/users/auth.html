@@ -1,13 +1,13 @@
 {% extends "layouts/default.html" %}
 
 {% block header %}
-<h1>Authenticating as {{ uuid }}</h1>
+<h1>Authenticating as {{ identifier }}</h1>
 {% endblock header %}
 
 {% block content %}
-<p>The user {{ uuid }} requires a password.</p>
+<p>The user {{ identifier }} requires a password.</p>
 
-<form method="post" action="/u/{{ uuid }}/auth">
+<form method="post" action="/u/{{ identifier }}/auth">
   <label>Password
   <input name= "password" type="password" />
   </label>

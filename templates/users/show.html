@@ -17,15 +17,15 @@
 {% if user.password-set %}
 <p>This profile is claimed</p>
 {% if not current-user %}
-<a href="/u/{{ user.uuid }}/auth">Login as {{ user.username }}</a>
+<a href="/u/{{ user.username }}/auth">Login as {{ user.username }}</a>
 {% endif %}
 
 {% else %}
 <p>This profile is open. You can claim it by setting a password.</p>
 
 {% if not current-user %}
-<form method="POST" action="/u/{{ user.uuid }}/login">
-  <input type="submit" value="Login as user {{ user.uuid }}" />
+<form method="POST" action="/u/{{ user.username }}/login">
+  <input type="submit" value="Login as user {{ user.username }}" />
 </form>
 {% endif %}
 {% endif %}

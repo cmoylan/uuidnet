@@ -138,6 +138,17 @@
   (with-flash :error "test flash message"
               (redirect (url-for :user-index))))
 
+@route GET "/tests/current-user"
+(defun current-user-test ()
+  (if *current-user*
+      *current-user*
+    "current user not set"))
+
+@route GET "/tests/session-user"
+(defun session-user-test ()
+   (gethash :current_uuid *session*))
+
+
 ;;
 ;; Routing rules
 
@@ -213,38 +224,38 @@
 ;;; --- Authentication routes --- ;;;
 ;;; These will all use uuid as the identifier for now
 
-@route GET "/u/:uuid/auth"
-(defun user-auth-form (&key uuid)
+@route GET "/u/:identifier/auth"
+(defun user-auth-form (&key identifier)
   "Show the auth form for a user"
-  (view:render #P"users/auth.html" (list :uuid uuid)))
+  (view:render #P"users/auth.html" (list :identifier identifier)))
 
 
-@route POST "/u/:uuid/auth"
-(defun user-auth (&key uuid _parsed)
+@route POST "/u/:identifier/auth"
+(defun user-auth (&key identifier _parsed)
   "Handle the submission of the auth form"
   (let* ((params (build-params _parsed))
          (password (gethash (intern "PASSWORD") params))
-         (user (find-user-by-uuid uuid)))
+         (user (find-user-by-public-identifier identifier)))
     (if (and user
              (authenticate-user user password))
         (progn
           (print "user is authenticated")
           (add-user-to-session user)
-          (redirect (url-for :user-show :uuid uuid)))
+          (redirect (url-for :user-show :identifier identifier)))
         (progn
           (print "wrong password!")
           (with-flash :error "incorrect passowrd"
-            (redirect (url-for :user-auth-form :uuid uuid)))))))
+            (redirect (url-for :user-auth-form :identifier identifier)))))))
 
 
-@route POST "/u/:uuid/login"
-(defun user-login (&key uuid)
+@route POST "/u/:identifier/login"
+(defun user-login (&key identifier)
   "Login as an open user"
-  (let ((user (user:find-user-by-uuid uuid)))
+  (let ((user (user:find-user-by-public-identifier identifier)))
     (if (not (user:password-set-p user))
         (progn (add-user-to-session user)
                (redirect (url-for :user-show :identifier (user-username user))))
-        (redirect (url-for :user-auth-form :uuid uuid)))))
+        (redirect (url-for :user-auth-form :identifier identifier)))))
 
 
 @route GET "/logout"
