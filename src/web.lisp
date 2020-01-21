@@ -192,7 +192,7 @@
 (defun user-create ()
   "Create an open user."
   (let ((new_user (add-open-user)))
-  (redirect (url-for :user-show :uuid (user-uuid new_user)))))
+  (redirect (url-for :user-show :identifier (user-username new_user)))))
 
 
 ;;; --- Message routes --- ;;;

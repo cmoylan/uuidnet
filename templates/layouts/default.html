@@ -13,7 +13,7 @@
 
   <nav class="top-nav">
     {% if current-user %}
-    Signed in as {{ current-user.username }}
+    Signed in as <a href="/u/{{ current-user.username }}">{{ current-user.username }}</a>
     <a href="/logout">logout</a>
     {% endif %}
   </nav>
