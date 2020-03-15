@@ -1,0 +1,41 @@
+{% extends "layouts/default.html" %}
+
+{% block header %}
+<h1>Profile ({{ user.username }})</h1>
+{% endblock %}
+
+
+{% block breadcrumb %}
+<a href="/">home</a> /
+user
+{% endblock %}
+
+
+{% block content %}
+
+{% ifequal current-user.uuid user.uuid %}
+current user is this user
+{% endifequal %}
+
+
+<ul>
+  <li>UUID: {{ user.uuid }}</li>
+  <li>username: {{ user.username }}</li>
+</ul>
+
+{% if messages %}
+<ul>
+{% for message in messages %}
+  <li>
+    {{ message.body }}
+    {{ message.created_at }}
+    --
+    {{ message }}
+  </li>
+{% endfor %}
+</ul>
+{% endif %}
+
+
+
+{% endblock %}

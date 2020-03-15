@@ -35,6 +35,7 @@
                  (:file "config")
                  (:file "schema" :depends-on ("db"))
                  (:file "message" :depends-on ("db"))
+                 (:file "compound-queries" :depends-on ("db" "user" "message"))
                  (:file "user" :depends-on ("db" "utilities"))
                  (:module "utilities"
                           :components

@@ -8,6 +8,7 @@
         :uuidnet.db
         :uuidnet.user
         :uuidnet.message
+        :uuidnet.compound-queries
         :datafly
         :sxql)
   (:export :*web*))
@@ -148,7 +149,6 @@
 (defun session-user-test ()
    (gethash :current_uuid *session*))
 
-
 ;;
 ;; Routing rules
 
@@ -195,6 +195,19 @@
   (redirect (url-for :user-show :uuid (user-uuid new_user)))))
 
 
+;;; --- Profile routes --- ;;;
+
+@route GET "/user"
+(defun user-profile ()
+  (require-user)
+  (let* ((user *current-user*)
+         (messages (messages-with-senders-by-recipient (user-id user))))
+    (print messages)
+    (render-with-session #P"users/profile.html"
+                         :user (user-for-template user)
+                         :messages (map 'list #'message-for-template messages))))
+
+
 ;;; --- Message routes --- ;;;
 
 ;;; Create message
@@ -218,7 +231,8 @@
   (let* ((user (find-user-by-public-identifier identifier))
          (messages (find-messages-between :sender_id (user-id *current-user*)
                                           :recipient_id (user-id user))))
-    (render-with-session #P"messages/show.html" :messages (map 'list #'message-for-template messages))))
+    (render-with-session #P"messages/show.html"
+                         :messages (map 'list #'message-for-template messages))))
 
 
 ;;; --- Authentication routes --- ;;;
