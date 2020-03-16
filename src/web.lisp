@@ -203,7 +203,6 @@
   (require-user)
   (let* ((user *current-user*)
          (messages (messages-with-senders-by-recipient (user-id user))))
-    ;(print (group-messages-by-sender messages))
     (render-with-session #P"users/profile.html"
                          :user (user-for-template user)
                          :message-groups (group-messages-by-sender messages))))

@@ -46,6 +46,9 @@
   updated-at)
 
 
+;; TODO need to use conversation_id or something so i can grab the replies (where sender_id is current_user)
+;;      conversation_id will need to be a primary key
+;;      we'll also probably was the ability to look up a conversation by 2 uuids/usernames
 (defun create-message (&key body sender_id recipient_id reply_id)
   (with-connection (db)
     (execute
@@ -111,6 +114,5 @@
         :created_at (local-time:format-timestring nil
                      (local-time:universal-to-timestamp (message-created-at message))
                      :format (list :short-month " " :day ", " :year " @ " :hour ":" :min ))
-        :thing (list :what "you")
         ;:sender (message-sender message)
         ))

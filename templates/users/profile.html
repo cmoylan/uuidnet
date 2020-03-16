@@ -35,6 +35,11 @@ current user is this user
       <span class="created_at">Sent at {{ message.created_at }}</span>
     </article>
     {% endfor %}
+
+    <form method="POST" action="/u/{{ group.sender-username }}/messages">
+      <textarea name="message-body"></textarea>
+      <input type="submit" value="Send" />
+    </form>
   </li>
 {% endfor %}
 </ul>

@@ -44,9 +44,9 @@ current user is this user
 
 {% if current-user %}
 {% ifnotequal current-user.uuid user.uuid %}
-<a href="/u/{{ user.uuid }}/messages">public messages</a>
+<a href="/u/{{ user.username }}/messages">public messages</a>
 
-<form method="POST" action="/u/{{ user.uuid }}/messages">
+<form method="POST" action="/u/{{ user.username }}/messages">
   <textarea name="message-body"></textarea>
   <input type="submit" value="Send" />
 </form>

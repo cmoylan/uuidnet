@@ -44,7 +44,8 @@
       (from :messages)
       (inner-join (:as :users :sender) :on (:= :sender.id :messages.sender_id))
       (where (:= :recipient_id recipient_id))
-      (group-by :messages.id :sender.username)
+      ;;(group-by :messages.id :sender.username)
+      (order-by :sender_id (:asc :created_at))
       )
      :as 'message-with-sender)))
 
