@@ -12,6 +12,7 @@
     <span>Body:</span>
     <p>{{ message.body }}</p>
     <p>Sent: {{ message.created_at | date }}</p>
+    <p>{{ message.thing.what }}</p>
   </li>
 {% endfor %}
 </ul>

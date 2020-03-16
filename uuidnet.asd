@@ -24,19 +24,27 @@
 
                ;; generate unique identifiers
                "uuid"
+
+               ;; make stuct and class access easier
+               ;l"access"
+
+               ;; iterate more easily, avoid loop
+               "iterate"
+
                )
   :components ((:module "src"
                 :components
                 ((:file "main" :depends-on ("config" "view" "db"))
-                 (:file "web" :depends-on ("view" "user" "message"))
+                 (:file "web" :depends-on ("view" "user" "message" "compound-queries"))
                  (:file "view" :depends-on ("config"))
                  (:file "db" :depends-on ("config"))
                  (:file "model" :depends-on ("db")) ;; model
                  (:file "config")
                  (:file "schema" :depends-on ("db"))
                  (:file "message" :depends-on ("db"))
-                 (:file "compound-queries" :depends-on ("db" "user" "message"))
                  (:file "user" :depends-on ("db" "utilities"))
+                 (:file "compound-queries" :depends-on ("db" "user" "message" "convenience"))
+                 (:file "convenience")
                  (:module "utilities"
                           :components
                           ((:file "nickname")))

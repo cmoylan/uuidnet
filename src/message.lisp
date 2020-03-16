@@ -106,5 +106,6 @@
         :reply_id (message-reply-id message)
         :body (message-body message)
         :created_at (message-created-at message)
+        :thing (list :what "you")
         ;:sender (message-sender message)
         ))

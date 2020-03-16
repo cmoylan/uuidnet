@@ -23,14 +23,16 @@ current user is this user
   <li>username: {{ user.username }}</li>
 </ul>
 
-{% if messages %}
+{% if message-groups %}
 <ul>
-{% for message in messages %}
+{% for group in message-groups %}
   <li>
-    {{ message.body }}
-    {{ message.created_at }}
-    --
-    {{ message }}
+    {{ group.sender-username }}
+    {{ group.sender-id }}
+    {% for message in group.messages %}
+    <p>{{ message.body }}</p>
+    <span>{{ message.created_at }}</span>
+    {% endfor %}
   </li>
 {% endfor %}
 </ul>

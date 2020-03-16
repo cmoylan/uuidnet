@@ -197,15 +197,16 @@
 
 ;;; --- Profile routes --- ;;;
 
-@route GET "/user"
+;; NOTE: ugh...might be time for some kind of presenter layer =(
+@route GET "/profile"
 (defun user-profile ()
   (require-user)
   (let* ((user *current-user*)
          (messages (messages-with-senders-by-recipient (user-id user))))
-    (print messages)
+    ;(print (group-messages-by-sender messages))
     (render-with-session #P"users/profile.html"
                          :user (user-for-template user)
-                         :messages (map 'list #'message-for-template messages))))
+                         :message-groups (group-messages-by-sender messages))))
 
 
 ;;; --- Message routes --- ;;;
