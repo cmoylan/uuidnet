@@ -80,3 +80,15 @@ dialog.notice {
 dialog.error {
   background-color: var(--light-red);
 }
+
+.message {
+  border: 1px solid #ccc;
+  margin: 1em 0;
+}
+.message p {
+  padding: 0.5em;
+}
+.message .created_at {
+  font-style: italic;
+  font-size: 0.8rem;
+}

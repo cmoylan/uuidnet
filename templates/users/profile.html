@@ -27,11 +27,13 @@ current user is this user
 <ul>
 {% for group in message-groups %}
   <li>
-    {{ group.sender-username }}
-    {{ group.sender-id }}
+    <div>Conversation with <a href="/u/{{ group.sender-username }}">{{ group.sender-username }}</a></div>
+
     {% for message in group.messages %}
-    <p>{{ message.body }}</p>
-    <span>{{ message.created_at }}</span>
+    <article class="message">
+      <p>{{ message.body }}</p>
+      <span class="created_at">Sent at {{ message.created_at }}</span>
+    </article>
     {% endfor %}
   </li>
 {% endfor %}

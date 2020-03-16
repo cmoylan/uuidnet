@@ -1,7 +1,7 @@
 (in-package :cl-user)
 
 (defpackage uuidnet.message
-  (:use :cl :sxql)
+  (:use :cl :sxql :local-time)
   (:import-from :uuidnet.db
                 :db
                 :with-connection
@@ -11,6 +11,8 @@
                 :execute
                 :retrieve-all
                 :retrieve-one)
+  ;(:import-from :local-time
+  ;              : )
   (:nicknames :message)
   (:export :create-message
            :find-messages-between
@@ -101,11 +103,14 @@
 
 (defun message-for-template (message)
   "transform the messages struct into an alist"
+  (print (now))
   (list :sender_id (message-sender-id message)
         :recipient_id (message-recipient-id message)
         :reply_id (message-reply-id message)
         :body (message-body message)
-        :created_at (message-created-at message)
+        :created_at (local-time:format-timestring nil
+                     (local-time:universal-to-timestamp (message-created-at message))
+                     :format (list :short-month " " :day ", " :year " @ " :hour ":" :min ))
         :thing (list :what "you")
         ;:sender (message-sender message)
         ))
