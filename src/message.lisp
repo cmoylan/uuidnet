@@ -49,6 +49,10 @@
 ;; TODO need to use conversation_id or something so i can grab the replies (where sender_id is current_user)
 ;;      conversation_id will need to be a primary key
 ;;      we'll also probably was the ability to look up a conversation by 2 uuids/usernames
+;;
+;;      look in the database for an existing message between uuid and current_uuid
+;;      if one is found use that
+;;      if one is not found, iterate the last...or set up the colum properly so this happens automatically
 (defun create-message (&key body sender_id recipient_id reply_id)
   (with-connection (db)
     (execute

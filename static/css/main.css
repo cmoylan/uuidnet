@@ -6,6 +6,7 @@
   --body: #fafafa;
   --light-blue: #e1f2fa;
   --light-red: #f5ab9e;
+  --light-gray: #ddd;
 }
 
 body {
@@ -79,6 +80,12 @@ dialog.notice {
 
 dialog.error {
   background-color: var(--light-red);
+}
+
+.notice.info {
+  background-color: var(--light-gray);
+  padding: 1em;
+  border: 1px solid #666;
 }
 
 .message {
