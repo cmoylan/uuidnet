@@ -38,7 +38,7 @@
   :components ((:module "src"
                 :components
                 ((:file "main" :depends-on ("config" "view" "db"))
-                 (:file "web" :depends-on ("view" "user" "message" "compound-queries"))
+                 (:file "web" :depends-on ("view" "user" "message" "presenters"))
                  (:file "view" :depends-on ("config"))
                  (:file "db" :depends-on ("config"))
                  (:file "model" :depends-on ("db")) ;; model
@@ -46,7 +46,7 @@
                  (:file "schema" :depends-on ("db"))
                  (:file "message" :depends-on ("db"))
                  (:file "user" :depends-on ("db" "utilities"))
-                 (:file "compound-queries" :depends-on ("db" "user" "message" "convenience"))
+                 (:file "presenters" :depends-on ("db" "user" "message" "convenience"))
                  (:file "convenience")
                  (:module "utilities"
                           :components

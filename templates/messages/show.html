@@ -3,22 +3,24 @@
 {% block content %}
 <p>messages between current user and uuid</p>
 
+{% if message-groups %}
 <h2>Messages</h2>
+
+{% include "messages/_message_groups.html" %}
+
+{% endif %}
+
 <ul>
 {% for message in messages %}
   <li>
-    <span>From:</span>{{ message.sender_id }}<br />
-    <span>To:</span>{{ message.recipient_id }}<br />
-    <span>Body:</span>
-    <p>{{ message.body }}</p>
-    <p>Sent: {{ message.created_at }}</p>
-    <p>{{ message.thing.what }}</p>
+    <article class="message">
+      <div><b>From:</b>{{ message.sender-username }}</div>
+      <div><b>To:</b>{{ message.recipient_id }}</div>
+      <p>{{ message.body }}</p>
+      <span class="created_at">Sent at {{ message.created_at }}</span>
+    </article>
   </li>
 {% endfor %}
 </ul>
 
-<form method="POST" action="/u/{{ uuid }}/messages">
-  <textarea name="message-body"></textarea>
-  <input type="submit" value="Send" />
-</form>
 {% endblock %}

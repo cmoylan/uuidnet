@@ -8,7 +8,7 @@
         :uuidnet.db
         :uuidnet.user
         :uuidnet.message
-        :uuidnet.compound-queries
+        :uuidnet.presenters
         :datafly
         :sxql)
   (:export :*web*))
@@ -197,7 +197,6 @@
 
 ;;; --- Profile routes --- ;;;
 
-;; NOTE: ugh...might be time for some kind of presenter layer =(
 @route GET "/profile"
 (defun user-profile ()
   (require-user)
@@ -229,10 +228,13 @@
   "Show messages between the requested and current user"
   (require-user)
   (let* ((user (find-user-by-public-identifier identifier))
-         (messages (find-messages-between :sender_id (user-id *current-user*)
-                                          :recipient_id (user-id user))))
+         ;;(messages (find-messages-between :sender_id (user-id *current-user*)
+         ;;                                 :recipient_id (user-id user))))
+         (messages (messages-with-users-between :sender_id (user-id *current-user*)
+                                                :recipient_id (user-id user))))
+    (print messages)
     (render-with-session #P"messages/show.html"
-                         :messages (map 'list #'message-for-template messages))))
+                         :message-groups (group-messages-by-sender messages))))
 
 
 ;;; --- Authentication routes --- ;;;

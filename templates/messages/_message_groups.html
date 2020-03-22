@@ -1,0 +1,21 @@
+<ul>
+{% for group in message-groups %}
+  <li>
+    <div>Conversation with <a href="/u/{{ group.sender-username }}">{{ group.sender-username }}</a></div>
+
+    {% for message in group.messages %}
+    <article class="message">
+      <div><b>To:</b> {{ message.recipient-username }}</div>
+      <div><b>From:</b> {{ message.sender-username}}</div>
+      <p>{{ message.body }}</p>
+      <span class="created_at">Sent at {{ message.created_at }}</span>
+    </article>
+    {% endfor %}
+
+    <form method="POST" action="/u/{{ group.sender-username }}/messages">
+      <textarea name="message-body"></textarea>
+      <input type="submit" value="Send" />
+    </form>
+  </li>
+{% endfor %}
+</ul>
