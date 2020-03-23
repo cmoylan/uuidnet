@@ -15,6 +15,7 @@
   ;              : )
   (:nicknames :message)
   (:export :create-message
+           :create-threaded-message
            :find-messages-between
            :find-messages-by-recipient
            :message-for-template
@@ -65,6 +66,23 @@
              :updated_at (local-time:now))))))
 
 
+(defun create-threaded-message (&key body sender_id recipient_id)
+  "Just like create-message but it will set the reply_id automatically"
+  ; reply-id
+  (let ((last-id 0)
+        (last-message
+          (last-message-between :sender_id sender_id :recipient_id recipient_id)))
+    (if last-message
+        (setf last-id (message-id last-message)))
+
+    (create-message :body body
+                    :sender_id sender_id
+                    :recipient_id recipient_id
+                    :reply_id last-id)
+    )
+
+ )
+
 (defun find-messages-by-sender (sender_id)
   (with-connection (db)
     (retrieve-all
@@ -108,9 +126,21 @@
      :as 'message)))
 
 
+(defun last-message-between (&key sender_id recipient_id)
+  "only return the latest message between two users"
+  (with-connection (db)
+    (retrieve-one
+     (select :*
+      (from :messages)
+       (where (:and (:= :sender_id sender_id)
+                    (:= :recipient_id recipient_id)))
+       (limit 1)
+       (order-by (:desc :created_at)))
+     :as 'message)))
+
+
 (defun message-for-template (message)
   "transform the messages struct into an alist"
-  (print (now))
   (list :sender_id (message-sender-id message)
         :recipient_id (message-recipient-id message)
         :reply_id (message-reply-id message)

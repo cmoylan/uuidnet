@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS messages (
        id           serial PRIMARY KEY,
        sender_id    int NOT NULL,
        recipient_id int NOT NULL,
-       reply_id     int,
+       reply_id     int NOT NULL DEFAULT 0,
        body         text NOT NULL,
        created_at   timestamp NOT NULL,
        updated_at   timestamp NOT NULL

@@ -216,10 +216,9 @@
   (require-user)
   (let ((params (build-params _parsed))
         (recipient (find-user-by-public-identifier identifier)))
-    (create-message :body (gethash (intern "MESSAGE-BODY") params)
-                    :sender_id (user-id *current-user*)
-                    :recipient_id (user-id recipient)
-                    :reply_id nil)
+    (create-threaded-message :body (gethash (intern "MESSAGE-BODY") params)
+                             :sender_id (user-id *current-user*)
+                             :recipient_id (user-id recipient))
     (redirect (url-for :user-show :identifier identifier))))
 
 

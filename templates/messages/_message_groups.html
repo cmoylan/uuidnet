@@ -12,6 +12,7 @@
     </article>
     {% endfor %}
 
+    <b>this form doesn't quite work in all contexts</b>
     <form method="POST" action="/u/{{ group.sender-username }}/messages">
       <textarea name="message-body"></textarea>
       <input type="submit" value="Send" />
