@@ -36,9 +36,11 @@
   (with-connection (db)
     (retrieve-all
      (select (:messages.*
+              (:as :recipient.username :recipient-username)
               (:as :sender.username :sender-username))
       (from :messages)
       (inner-join (:as :users :sender) :on (:= :sender.id :messages.sender_id))
+      (inner-join (:as :users :recipient) :on (:= :recipient.id :messages.recipient_id))
       (where (:= :recipient_id recipient_id))
       ;;(group-by :messages.id :sender.username)
       (order-by :sender_id (:asc :created_at))
@@ -71,10 +73,7 @@
       (progn
         (if (string= (message-with-sender-sender-username message) current-sender)
             ;;; true: still building the current-group
-            (setf current-messages (append-list current-messages
-                                                (append (message-for-template message)
-                                                        (list :sender-username (message-with-sender-sender-username message)
-                                                              :recipient-username (message-with-sender-recipient-username message)))))
+            (setf current-messages (append-list current-messages (message-for-template-with-users message)))
             ;;; false: start a new group
             (progn
               ;; write the queued up messages to results
@@ -83,13 +82,18 @@
                                              (list :sender-username current-sender
                                                    :messages current-messages))))
 
-
               ;; start building a new current-group
               (setf current-sender (message-with-sender-sender-username message))
-              (setf current-messages (list (message-for-template message)))))))
+              (setf current-messages (list (message-for-template-with-users message)))))))
 
     ;; add the last group to the results
     (setf results (append-list results
                                (list :sender-username current-sender
                                      :messages current-messages)))
     results))
+
+(defun message-for-template-with-users (message)
+  "Return the message as an alist with additional fields joined from user"
+  (append (message-for-template message)
+          (list :sender-username (message-with-sender-sender-username message)
+                :recipient-username (message-with-sender-recipient-username message))))
