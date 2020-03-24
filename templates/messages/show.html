@@ -3,24 +3,6 @@
 {% block content %}
 <p>messages between current user and uuid</p>
 
-{% if message-groups %}
-<h2>Messages</h2>
-
-{% include "messages/_message_groups.html" %}
-
-{% endif %}
-
-<ul>
-{% for message in messages %}
-  <li>
-    <article class="message">
-      <div><b>From:</b>{{ message.sender-username }}</div>
-      <div><b>To:</b>{{ message.recipient_id }}</div>
-      <p>{{ message.body }}</p>
-      <span class="created_at">Sent at {{ message.created_at }}</span>
-    </article>
-  </li>
-{% endfor %}
-</ul>
+{% include "messages/_thread.html" %}
 
 {% endblock %}

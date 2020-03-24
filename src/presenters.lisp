@@ -20,6 +20,7 @@
 
   (:export :messages-with-senders-by-recipient
            :messages-with-users-between
+           :message-for-template-with-users
            :group-messages-by-sender))
 
 (in-package :uuidnet.presenters)
@@ -58,10 +59,11 @@
       (from :messages)
       (inner-join (:as :users :sender) :on (:= :sender.id :messages.sender_id))
       (inner-join (:as :users :recipient) :on (:= :recipient.id :messages.recipient_id))
-      (where (:and (:= :sender_id sender_id)
-                   (:= :recipient_id recipient_id))))
+      (where (:or (:and (:= :sender_id sender_id)
+                        (:= :recipient_id recipient_id))
+                  (:and (:= :sender_id recipient_id)
+                        (:= :recipient_id sender_id)))))
      :as 'message-with-sender)))
-
 
 
 (defun group-messages-by-sender (messages)

@@ -1,0 +1,14 @@
+{% for message in messages %}
+<article class="message">
+  <div><b>To:</b> {{ message.recipient-username }}</div>
+   <div><b>From:</b> {{ message.sender-username}}</div>
+    <p>{{ message.body }}</p>
+    <span class="created_at">Sent at {{ message.created_at }}</span>
+ </article>
+{% endfor %}
+
+<b>this form doesn't quite work in all contexts</b>
+<form method="POST" action="/u/{{ group.sender-username }}/messages">
+  <textarea name="message-body"></textarea>
+  <input type="submit" value="Send" />
+</form>
