@@ -9,6 +9,7 @@
         :uuidnet.user
         :uuidnet.message
         :uuidnet.presenters
+        :uuidnet.utilities.controller
         :datafly
         :sxql)
   (:export :*web*))
@@ -27,6 +28,7 @@
 (clear-routing-rules *web*)
 (defvar *current-user* nil)
 (defvar *flash* nil)
+
 
 
 (defun render-with-session (template &rest args)
@@ -183,9 +185,20 @@
 
 
 ;;; Update user
+;;; NOTE right now this just handles password changes
 @route POST "/u/:identifier"
-(defun user-update (&key identifier)
-  )
+(defun user-update (&key identifier _parsed)
+  (let* ((params (build-params _parsed))
+         (password (gethash (intern "PASSWORD") params))
+         (user (user:find-user-by-public-identifier identifier)))
+    (if (not (user:password-set-p user))
+        (progn
+          (user:update-user :id (user:user-id user) :password password)
+          (add-user-to-session user)
+          (set-current-user-from-session)
+          (redirect (url-for :user-show :identifier (user:user-username user))))
+        (with-flash :error "user already has a password set"
+          (redirect (url-for :user-show :identifier identifier))))))
 
 
 @route POST "/users"

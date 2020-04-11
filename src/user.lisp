@@ -22,6 +22,7 @@
            :user-for-template
            :add-user
            :add-open-user
+           :update-user
            :seed-users
            :user-requires-auth-p
            :user-uuid
@@ -153,6 +154,16 @@
    (or (find-user-by-username identifier)
        (find-user-by-email identifier)
        (find-user-by-uuid identifier)))
+
+
+;; will probably need to update more attributes in the future
+(defun update-user (&key id password)
+  "update a user's password"
+  (with-connection (db)
+    (execute
+     (update :users
+       (set= :password (cl-pass:hash password))
+       (where (:= :id id))))))
 
 
 (defun user-requires-auth-p (user)

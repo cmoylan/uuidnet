@@ -50,7 +50,8 @@
                  (:file "convenience")
                  (:module "utilities"
                           :components
-                          ((:file "nickname")))
+                          ((:file "nickname")
+                           (:file "controller")))
                  )))
 
 

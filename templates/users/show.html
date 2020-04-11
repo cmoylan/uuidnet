@@ -26,11 +26,16 @@
   {% endif %}
 
 {% else %}
-<p>This profile is open. You can claim it by setting a password.</p>
+<p>This profile is open. You can login or claim it by setting a password.</p>
 
   {% if not current-user %}
   <form method="POST" action="/u/{{ user.username }}/login">
-    <input type="submit" value="Login as user {{ user.username }}" />
+    <input type="submit" value="Login once as user {{ user.username }}" />
+  </form>
+
+  <form method="POST" action="/u/{{ user.username }}">
+    <input type="password" name="password" />
+    <input type="submit" value="Set a password for user {{ user.username }}" />
   </form>
   {% endif %}
 {% endif %}
