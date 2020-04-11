@@ -240,13 +240,11 @@
   "Show messages between the requested and current user"
   (require-user)
   (let* ((user (find-user-by-public-identifier identifier))
-         ;;(messages (find-messages-between :sender_id (user-id *current-user*)
-         ;;                                 :recipient_id (user-id user))))
          (messages (messages-with-users-between :sender_id (user-id *current-user*)
                                                 :recipient_id (user-id user))))
     (print messages)
     (render-with-session #P"messages/show.html"
-                         :message-groups (group-messages-by-sender messages))))
+                         :messages (map 'list #'message-for-template-with-users messages))))
 
 
 ;;; --- Authentication routes --- ;;;
