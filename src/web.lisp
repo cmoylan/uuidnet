@@ -188,9 +188,15 @@
 ;;; NOTE right now this just handles password changes
 @route POST "/u/:identifier"
 (defun user-update (&key identifier _parsed)
+  (require-user)
   (let* ((params (build-params _parsed))
          (password (gethash (intern "PASSWORD") params))
          (user (user:find-user-by-public-identifier identifier)))
+
+    (if (not(eq user *current-user*))
+        (with-flash :error "you can only update the user you are logged in as"
+          (redirect (or referer (url-for :root)))))
+
     (if (not (user:password-set-p user))
         (progn
           (user:update-user :id (user:user-id user) :password password)
