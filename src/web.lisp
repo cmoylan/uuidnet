@@ -207,6 +207,22 @@
           (redirect (url-for :user-show :identifier identifier))))))
 
 
+@route POST "/u/:identifier/release"
+(defun user-release (&key identifier)
+  "Remove the password for a user"
+  (require-user)
+  (let ((user (user:find-user-by-public-identifier identifier)))
+    (if (not(eq user *current-user*))
+        (with-flash :error "you can only update the user you are logged in as"
+          (redirect (or referer (url-for :root)))))
+    (if (user:password-set-p user)
+        (progn
+          ; do it here
+        )
+        (with-flash :error "user already open"
+          (redirect (url-for :user-show :identifier identifier))))))
+
+
 @route POST "/users"
 (defun user-create ()
   "Create an open user."

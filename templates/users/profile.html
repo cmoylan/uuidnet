@@ -26,6 +26,10 @@ current user is this user
   <li>username: {{ user.username }}</li>
 </ul>
 
+<form method="POST" action="/u/{{ user.username }}">
+  <input type="hidden" name="password" value="" />
+  <input type="submit" value="Remove password for user {{ user.username }}" />
+</form>
 
 {% if message-groups %}
 {% include "messages/_message_groups.html" %}
